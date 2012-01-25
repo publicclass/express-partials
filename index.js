@@ -39,8 +39,7 @@ module.exports = function(){
     // layout support
     var _render = res.render.bind(res);
     res.render = function(name, options, fn){
-      var layout = options && options.layout
-        , ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
+      var layout = options && options.layout;
 
       // default layout
       if( layout === true || layout === undefined )
@@ -57,6 +56,7 @@ module.exports = function(){
           options.body = body;
 
           // now render the layout
+          var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
           _render(basename(layout,ext)+ext, options, fn);
         })
 

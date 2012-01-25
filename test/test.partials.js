@@ -22,8 +22,12 @@ app.get('/mobile.ejs',function(req,res,next){
   res.render('index.ejs',{layout:'mobile.ejs'})
 })
 
-app.get('/collection',function(req,res,next){
-  res.render('collection.ejs',{list:[{name:'one'},{name:'two'}]})
+app.get('/collection/_entry',function(req,res,next){
+  res.render('collection.ejs',{name: 'entry', list:[{name:'one'},{name:'two'}]})
+})
+
+app.get('/collection/thing',function(req,res,next){
+  res.render('collection.ejs',{name: 'thing', list:[{name:'one'},{name:'two'}]})
 })
 
 describe('app',function(){
@@ -70,6 +74,30 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>express-partials mobile</title></head><body><h1>Index</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /collection/_entry',function(){
+    it('should render _entry.ejs for every item with layout.ejs as layout',function(done){
+      request(app)
+        .get('/collection/_entry')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>express-partials</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /collection/thing',function(){
+    it('should render thing/index.ejs for every item with layout.ejs as layout',function(done){
+      request(app)
+        .get('/collection/thing')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>express-partials</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');
           done();
         })
     })
