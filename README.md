@@ -12,6 +12,7 @@ The beloved feature from Express 2.x is back as a middleware!
 
 ## Usage
    
+```javascript
    var express = require('express')
      , partials = require('express-partials')
      , app = express();
@@ -31,6 +32,7 @@ The beloved feature from Express 2.x is back as a middleware!
      res.render('index.ejs',{layout:'mobile'})
      // -> render mobile.ejs with index.ejs as `body`.
    })
+```
 
 
 ## Template Support
