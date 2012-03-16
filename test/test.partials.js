@@ -6,12 +6,25 @@ var app = express();
 app.use(partials());
 app.set('views',__dirname + '/fixtures')
 
+app.locals.use(function(req,res,next){
+  app.locals.hello = 'there';
+  next()
+})
+
 app.get('/',function(req,res,next){
   res.render('index.ejs')
 })
 
 app.get('/no-layout',function(req,res,next){
   res.render('index.ejs',{layout:false})
+})
+
+app.get('/res-locals',function(req,res,next){
+  res.render('locals.ejs',{layout:false,hello:'here'})
+})
+
+app.get('/app-locals',function(req,res,next){
+  res.render('locals.ejs',{layout:false})
 })
 
 app.get('/mobile',function(req,res,next){
@@ -50,6 +63,30 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<h1>Index</h1>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /res-locals',function(){
+    it('should render "here" without layout',function(done){
+      request(app)
+        .get('/res-locals')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<h1>here</h1>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /app-locals',function(){
+    it('should render "there" without layout',function(done){
+      request(app)
+        .get('/app-locals')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<h1>there</h1>');
           done();
         })
     })
