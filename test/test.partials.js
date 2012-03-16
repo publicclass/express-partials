@@ -6,9 +6,8 @@ var app = express();
 app.use(partials());
 app.set('views',__dirname + '/fixtures')
 
-app.locals.use(function(req,res,next){
+app.locals.use(function(req,res){
   app.locals.hello = 'there';
-  next()
 })
 
 app.get('/',function(req,res,next){
@@ -20,11 +19,11 @@ app.get('/no-layout',function(req,res,next){
 })
 
 app.get('/res-locals',function(req,res,next){
-  res.render('locals.ejs',{layout:false,hello:'here'})
+  res.render('locals.ejs',{hello:'here'})
 })
 
 app.get('/app-locals',function(req,res,next){
-  res.render('locals.ejs',{layout:false})
+  res.render('locals.ejs')
 })
 
 app.get('/mobile',function(req,res,next){
@@ -69,24 +68,24 @@ describe('app',function(){
   })
 
   describe('GET /res-locals',function(){
-    it('should render "here" without layout',function(done){
+    it('should render "here"',function(done){
       request(app)
         .get('/res-locals')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<h1>here</h1>');
+          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>here</h1></body></html>');
           done();
         })
     })
   })
 
   describe('GET /app-locals',function(){
-    it('should render "there" without layout',function(done){
+    it('should render "there"',function(done){
       request(app)
         .get('/app-locals')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<h1>there</h1>');
+          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>there</h1></body></html>');
           done();
         })
     })
