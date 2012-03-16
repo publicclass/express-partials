@@ -207,6 +207,10 @@ function partial(view, options){
   if( locals )
     options.__proto__ = locals;
 
+  // merge app locals into 
+  for(var k in this.app.locals)
+    options[k] = options[k] || this.app.locals[k];
+
   // extract object name from view
   name = options.as || resolveObjectName(view);
 
