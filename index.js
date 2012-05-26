@@ -8,26 +8,55 @@ var ejs = require('ejs')
   , basename = path.basename
   , fs = require('fs');
 
-
 /**
- * Express 3.x Layout & Partial support.
+ * Express 3.x Layout & Partial support for EJS.
  *
- * The beloved feature from Express 2.x is back as a template engine.
+ * The `partial` feature from Express 2.x is back as a template engine,
+ * along with support for `layout`, `include` and `block/script/stylesheet`.
  *
- * Example:
+ *
+ * Example index.ejs:
+ *
+ *   <% layout('boilerplate') %>
+ *   <h1>I am the <%=what%> template</h1>
+ *   <% script('foo.js') %>
+ *
+ *
+ * Example boilerplate.ejs:
+ *
+ *   <html>
+ *     <head>
+ *       <title>It's <%=who%></title>
+ *       <%-scripts%>
+ *     </head>
+ *     <body><%-body%></body>
+ *   </html>
+ *
+ *
+ * Sample app:
  *
  *    var express = require('express')
- *      , partials = require('express-partials')
  *      , app = express();
- *    app.engine('ejs', partials);  // use us for all ejs templates
- *    app.locals({ layout: true }); // if you want layout by default
+ *
+ *    // use ejs-locals for all ejs templates:
+ *    app.engine('ejs', require('ejs-locals'));
+ *
+ *    // render 'index' into 'boilerplate':
  *    app.get('/',function(req,res,next){
- *      res.render('index.ejs') // renders layout.ejs with index.ejs as `body`.
- *    })
+ *      res.render('index', { what: 'best', who: 'me' });
+ *    });
  *
- * Options:
+ *    app.listen(3000);
  *
- *    none
+ * Example output for GET /:
+ *
+ *   <html>
+ *     <head>
+ *       <title>It's me</title>
+ *       <script src="foo.js"></script>
+ *     </head>
+ *     <body><h1>I am the best template</h1></body>
+ *   </html>
  *
  */
 
@@ -43,42 +72,27 @@ var renderFile = module.exports = function(path, options, fn){
     options.locals.stylesheet = stylesheet.bind(blocks.stylesheets);
     options.locals.script = script.bind(blocks.scripts);
   }
-  // override locals for inherits/include/partial bound to current options
-  options.locals.inherits = inherits.bind(options);
+  // override locals for layout/include/partial bound to current options
+  options.locals.layout  = layout.bind(options);
   options.locals.include = include.bind(options);
   options.locals.partial = partial.bind(options);
 
   ejs.renderFile(path, options, function(err, html) {
 
-    var layout = (options.locals && options.locals._layout) || options.layout;
-
-    // recurse and use this layout as `body` in the parent
+    var layout = options.locals._layoutFile
     if (layout) {
 
-      if (layout === true) {
-        // default layout
-        layout = 'layout.ejs';
-      }
-
-      if (extname(layout) != '.ejs') {
-        // default extension
-        // FIXME: how to reach 'view engine' from here?
-        layout += '.ejs'
-      }
-
-      // clear to make sure we don't recurse forever
-      delete options.layout;
-      if (options.locals && options.locals._layout) {
-         // clear for next iteration (layouts can be nested)
-        delete options.locals._layout;
-      }
+      // clear to make sure we don't recurse forever (layouts can be nested)
+      delete options.locals._layoutFile;
+      // make sure caching works inside ejs.renderFile/render
       delete options.filename;
 
-      // find layout path relative to current template
-      var file = join(dirname(path), layout);
+      // find layout path relative to current template, then
+      // recurse and use this layout as `body` in the parent
       options.locals.body = html;
-      renderFile(file, options, fn);
+      renderFile(join(dirname(path), layout), options, fn);
     } else {
+      // no layout, just do the default:
       fn(null, html);
     }
   });
@@ -308,23 +322,35 @@ function partial(view, options){
 }
 
 /**
- * Apply the given `view` as the layout for the current template.
- * Current template will be supplied to this view as `body`.
+ * Apply the given `view` as the layout for the current template,
+ * using the current options/locals. The current template will be
+ * supplied to the given `view` as `body`, along with any `blocks`
+ * added by child templates.
  *
- * (`layout` is bound to res in the middleware, so this == res)
+ * `options` are bound  to `this` in renderFile, you just call
+ * `include('myview')`
  *
  * @param  {String} view
  * @api private
  */
-function inherits(view){
-  this.locals._layout = view;
+function layout(view){
+  if (view === true) {
+    // default layout
+    view = 'layout.ejs';
+  }
+  if (extname(view) != '.ejs') {
+    // default extension
+    // FIXME: how to reach 'view engine' from here?
+    view += '.ejs'
+  }
+  this.locals._layoutFile = view;
 }
 
 /**
  * Apply the current `options` to the given `view` to be included
  * in the current template at call time.
  *
- * `options` are bound in the middleware, you just call `include('myview')`
+ * `options` are bound in renderFile, you just call `include('myview')`
  *
  * @param  {String} view
  * @api private
