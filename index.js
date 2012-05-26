@@ -33,7 +33,17 @@ var ejs = require('ejs')
 
 var renderFile = module.exports = function(path, options, fn){
 
-  options.locals.block = block.bind(options);
+  if (!options.locals.blocks) {
+    // one set of blocks no matter how often we recurse
+    var blocks = { scripts: new Block(), stylesheets: new Block() };
+    options.locals.blocks = blocks;
+    options.locals.scripts = blocks.scripts;
+    options.locals.stylesheets = blocks.stylesheets;
+    options.locals.block = block.bind(blocks);
+    options.locals.stylesheet = stylesheet.bind(blocks.stylesheets);
+    options.locals.script = script.bind(blocks.scripts);
+  }
+  // override locals for inherits/include/partial bound to current options
   options.locals.inherits = inherits.bind(options);
   options.locals.include = include.bind(options);
   options.locals.partial = partial.bind(options);
@@ -355,14 +365,32 @@ Block.prototype = {
  * @api private
  */
 function block(name, html) {
-  var blocks = this.locals._blocks || (this.locals._blocks = {});
-  if (!blocks[name]) {
+  // bound to the blocks object in renderFile
+  var blk = this[name];
+  if (!blk) {
     // always create, so if we request a
     // non-existent block we'll get a new one
-    blocks[name] = new Block();
+    blk = this[name] = new Block();
   }
   if (html) {
-    blocks[name].append(html);
+    blk.append(html);
   }
-  return blocks[name];
+  return blk;
 }
+
+// bound to scripts Block in renderFile
+function script(path, type) {
+  if (path) {
+    this.append('<script src="'+path+'"'+(type ? 'type="'+type+'"' : '')+'></script>');
+  }
+  return this;
+}
+
+// bound to stylesheets Block in renderFile
+function stylesheet(path) {
+  if (path) {
+    this.append('<link rel="stylesheet" href="'+path+'" />');
+  }
+  return this;
+}
+
