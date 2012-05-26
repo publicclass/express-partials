@@ -3,11 +3,10 @@ var express = require('express')
   , partials = require('../');
 
 var app = express();
-// app.use(partials());
 app.set('views',__dirname + '/fixtures');
 app.engine('ejs', partials);
 app.locals({
-  layout: true
+  _layoutFile: true
 })
 
 app.locals.use(function(req,res){
@@ -19,7 +18,7 @@ app.get('/',function(req,res,next){
 })
 
 app.get('/no-layout',function(req,res,next){
-  res.render('index.ejs',{layout:false})
+  res.render('index.ejs',{_layoutFile:false})
 })
 
 app.get('/res-locals',function(req,res,next){
@@ -31,11 +30,11 @@ app.get('/app-locals',function(req,res,next){
 })
 
 app.get('/mobile',function(req,res,next){
-  res.render('index.ejs',{layout:'mobile'})
+  res.render('index.ejs',{_layoutFile:'mobile'})
 })
 
 app.get('/mobile.ejs',function(req,res,next){
-  res.render('index.ejs',{layout:'mobile.ejs'})
+  res.render('index.ejs',{_layoutFile:'mobile.ejs'})
 })
 
 app.get('/collection/_entry',function(req,res,next){
@@ -51,19 +50,19 @@ app.get('/with-layout',function(req,res,next){
 })
 
 app.get('/with-layout-override',function(req,res,next){
-  res.render('with-layout.ejs',{layout:false})
+  res.render('with-layout.ejs',{_layoutFile:false})
 })
 
 app.get('/with-include-here',function(req,res,next){
-  res.render('with-include.ejs',{layout:false, hello:'here'});
+  res.render('with-include.ejs',{_layoutFile:false, hello:'here'});
 })
 
 app.get('/with-include-there',function(req,res,next){
-  res.render('with-include.ejs',{layout:false});
+  res.render('with-include.ejs',{_layoutFile:false});
 })
 
 app.get('/with-blocks',function(req,res,next){
-  res.render('with-blocks.ejs',{layout:false});
+  res.render('with-blocks.ejs',{_layoutFile:false});
 })
 
 app.get('/deep-inheritance',function(req,res,next){

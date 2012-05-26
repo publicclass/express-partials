@@ -80,10 +80,30 @@ var renderFile = module.exports = function(path, options, fn){
   ejs.renderFile(path, options, function(err, html) {
 
     var layout = options.locals._layoutFile
+
+    // for backward-compatibility, allow options to
+    // set a default layout file for the view or the app
+    // (NB:- not called `layout` any more so it doesn't
+    // conflict with the layout() function)
+    if (layout === undefined) {
+      layout = options._layoutFile;
+    }
+
     if (layout) {
+
+      // apply default layout if only "true" was set
+      if (layout === true) {
+        layout = 'layout.ejs';
+      }
+      // apply default extension
+      if (extname(layout) != '.ejs') {
+        // FIXME: how to reach 'view engine' from here?
+        layout += '.ejs'
+      }
 
       // clear to make sure we don't recurse forever (layouts can be nested)
       delete options.locals._layoutFile;
+      delete options._layoutFile;
       // make sure caching works inside ejs.renderFile/render
       delete options.filename;
 
@@ -334,15 +354,6 @@ function partial(view, options){
  * @api private
  */
 function layout(view){
-  if (view === true) {
-    // default layout
-    view = 'layout.ejs';
-  }
-  if (extname(view) != '.ejs') {
-    // default extension
-    // FIXME: how to reach 'view engine' from here?
-    view += '.ejs'
-  }
   this.locals._layoutFile = view;
 }
 
