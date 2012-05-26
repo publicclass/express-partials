@@ -330,7 +330,23 @@ function inherits(view){
  * @api private
  */
 function include(view) {
-  return partial.apply(this, [ view ]);
+
+  // find view, relative to this filename (this == original options)
+  // (FIXME: options.filename is set by ejs engine, other engines may need more help)
+  var root = dirname(this.filename)
+    , ext = extname(view)
+    , file = join(root, view + (ext ? '' : '.ejs'))
+    , key = file + ':string';
+
+  // read view
+  var source = this.cache
+    ? cache[key] || (cache[key] = fs.readFileSync(file, 'utf8'))
+    : fs.readFileSync(file, 'utf8');
+
+  this.filename = file;
+
+  // TODO Support other templates (but it's sync now...)
+  return ejs.render(source, this);
 }
 
 function Block() {
@@ -387,9 +403,9 @@ function script(path, type) {
 }
 
 // bound to stylesheets Block in renderFile
-function stylesheet(path) {
+function stylesheet(path, media) {
   if (path) {
-    this.append('<link rel="stylesheet" href="'+path+'" />');
+    this.append('<link rel="stylesheet" href="'+path+'"'+(media ? 'media="'+media+'"' : '')+' />');
   }
   return this;
 }
