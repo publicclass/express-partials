@@ -13,7 +13,7 @@ var ejs = require('ejs')
  * The beloved feature from Express 2.x is back as a middleware.
  *
  * Example:
- *    
+ *
  *    var express = require('express')
  *      , partials = require('express-partials')
  *      , app = express();
@@ -21,7 +21,7 @@ var ejs = require('ejs')
  *    app.get('/',function(req,res,next){
  *      res.render('index.ejs') // renders layout.ejs with index.ejs as `body`.
  *    })
- * 
+ *
  * Options:
  *
  *    none
@@ -36,34 +36,54 @@ module.exports = function(){
     // in template partial(view,options)
     res.locals.partial = partial.bind(res);
 
+    // in template layout override, inherits(view)
+    res.locals.inherits = inherits.bind(res);
+
+    // in template layout override, inherits(view)
+    res.locals.block = block.bind(res);
+
     // layout support
     var _render = res.render.bind(res);
     res.render = function(name, options, fn){
-      var layout = options && options.layout;
 
-      // default layout
-      if( layout === true || layout === undefined )
-        layout = 'layout';
-      
-      // layout
-      if( layout ){
-        // first render normally
-        _render(name, options, function(err, body){
-          if( err )
-            return fn ? fn(err) : req.next(err);
+      // in template include (with same locals)
+      res.locals.include = include.bind(res, options);
+
+      // first render normally
+      _render(name, options, function(err, body){
+
+        if( err )
+          return fn ? fn(err) : req.next(err);
+
+        var layout = options && options.layout;
+
+        // can be overridden by layout local
+        if ('_layout' in res.locals) {
+          layout = res.locals._layout;
+          delete res.locals._layout;
+        }
+
+        // default layout
+        if( layout === true || layout === undefined )
+          layout = 'layout';
+
+        // layout
+        if( layout ){
 
           options = options || {};
           options.body = body;
+          options.layout = false;
 
           // now render the layout
           var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
           _render(basename(layout,ext)+ext, options, fn);
-        })
 
-      // no layout
-      } else {
-        _render(name, options, fn);
-      }
+        // no layout
+        } else {
+          // (we already handled err above)
+          return fn ? fn(err,body) : res.send(body);
+        }
+      })
     }
 
     // done
@@ -207,7 +227,7 @@ function partial(view, options){
   if( locals )
     options.__proto__ = locals;
 
-  // merge app locals into 
+  // merge app locals into
   for(var k in this.app.locals)
     options[k] = options[k] || this.app.locals[k];
 
@@ -218,7 +238,7 @@ function partial(view, options){
   var root = this.app.get('views') || process.cwd() + '/views'
     , ext = extname(view) || '.' + (this.app.get('view engine') || 'ejs')
     , file = lookup(root, view, ext);
-  
+
   // read view
   var source = fs.readFileSync(file,'utf8');
 
@@ -275,4 +295,64 @@ function partial(view, options){
   } else {
     return render();
   }
+}
+
+/**
+ * Apply the given `view` as the layout for the current template.
+ * Current template will be supplied to this view as `body`.
+ *
+ * (`layout` is bound to res in the middleware, so this == res)
+ *
+ * @param  {String} view
+ * @api public
+ */
+function inherits(view){
+  this.locals._layout = view;
+}
+
+/**
+ * Apply the given `options` to the given `view` to be included
+ * in the current template.
+ *
+ * `options` are bound in the middleware, you just call include())
+ * `layout` is bound to res in the middleware, so this == res
+ *
+ * @param  {Object} options
+ * @param  {String} view
+ * @api public
+ */
+function include(options, view) {
+  return partial.apply(this, [ view, options ]);
+}
+
+function Block() {
+  this.html = [];
+}
+
+Block.prototype = {
+  toString: function() {
+    return this.html.join('\n');
+  },
+  append: function(more) {
+    this.html.push(more);
+  },
+  prepend: function(more) {
+    this.html.unshift(more);
+  },
+  replace: function(instead) {
+    this.html = [ instead ];
+  }
+};
+
+function block(name, html) {
+  var blocks = this.locals._blocks || (this.locals._blocks = {});
+  if (!blocks[name]) {
+    // always create, so if we request a
+    // non-existent block we'll get a new one
+    blocks[name] = new Block();
+  }
+  if (html) {
+    blocks[name].append(html);
+  }
+  return blocks[name];
 }
