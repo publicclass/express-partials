@@ -1,10 +1,15 @@
 var express = require('express')
   , request = require('./support/http')
-  , partials = require('../');
+  , engine = require('../');
 
 var app = express();
 app.set('views',__dirname + '/fixtures');
-app.engine('ejs', partials);
+app.engine('ejs', engine);
+
+// this is not the default behavior, but you can set this
+// if you want to load `layout.ejs` as the default layout
+// (this was the default in Express 2.0 so it's handy for
+// quick ports and upgrades)
 app.locals({
   _layoutFile: true
 })
@@ -81,7 +86,7 @@ describe('app',function(){
         .get('/')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>Index</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>Index</h1></body></html>');
           done();
         })
     })
@@ -105,7 +110,7 @@ describe('app',function(){
         .get('/res-locals')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>here</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>here</h1></body></html>');
           done();
         })
     })
@@ -117,7 +122,7 @@ describe('app',function(){
         .get('/app-locals')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>there</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>there</h1></body></html>');
           done();
         })
     })
@@ -129,7 +134,7 @@ describe('app',function(){
         .get('/mobile')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials mobile</title></head><body><h1>Index</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals mobile</title></head><body><h1>Index</h1></body></html>');
           done();
         })
     })
@@ -141,7 +146,7 @@ describe('app',function(){
         .get('/mobile.ejs')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials mobile</title></head><body><h1>Index</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals mobile</title></head><body><h1>Index</h1></body></html>');
           done();
         })
     })
@@ -153,7 +158,7 @@ describe('app',function(){
         .get('/collection/_entry')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');
           done();
         })
     })
@@ -165,7 +170,7 @@ describe('app',function(){
         .get('/collection/thing')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');
           done();
         })
     })
@@ -177,7 +182,7 @@ describe('app',function(){
         .get('/with-layout')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>Index</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>Index</h1></body></html>');
           done();
         })
     })
@@ -189,7 +194,7 @@ describe('app',function(){
         .get('/with-layout-override')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>Index</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>Index</h1></body></html>');
           done();
         })
     })
@@ -201,7 +206,7 @@ describe('app',function(){
         .get('/with-include-here')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>here</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>here</h1></body></html>');
           done();
         })
     })
@@ -213,7 +218,7 @@ describe('app',function(){
         .get('/with-include-there')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>there</h1></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>there</h1></body></html>');
           done();
         })
     })
@@ -237,7 +242,7 @@ describe('app',function(){
         .get('/deep-inheritance')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title></head><body><i>I am grandchild content.</i><b>I am child content.</b><u>I am parent content.</u></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><i>I am grandchild content.</i><b>I am child content.</b><u>I am parent content.</u></body></html>');
           done();
         })
     })
@@ -249,7 +254,7 @@ describe('app',function(){
         .get('/deep-inheritance-blocks')
         .end(function(res){
           res.should.have.status(200);
-          res.body.should.equal('<html><head><title>express-partials</title><script src="gc.js"></script>\n<script src="c.js"></script><link rel="stylesheet" href="gc.css" />\n<link rel="stylesheet" href="c.css" /></head><body><i>I am grandchild content.</i><b>I am child content.</b><u>I am parent content.</u></body></html>');
+          res.body.should.equal('<html><head><title>ejs-locals</title><script src="gc.js"></script>\n<script src="c.js"></script><link rel="stylesheet" href="gc.css" />\n<link rel="stylesheet" href="c.css" /></head><body><i>I am grandchild content.</i><b>I am child content.</b><u>I am parent content.</u></body></html>');
           done();
         })
     })
