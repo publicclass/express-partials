@@ -31,54 +31,47 @@ var ejs = require('ejs')
  *
  */
 
-var renderFile = module.exports = function(path, options, fn){
-
-  var key = path + ':string';
-
-  options.filename = path;
+module.exports = function(path, options, fn){
 
   options.locals.block = block.bind(options);
   options.locals.inherits = inherits.bind(options);
   options.locals.include = include.bind(options);
   options.locals.partial = partial.bind(options);
 
-  try {
-    var str = options.cache
-      ? cache[key] || (cache[key] = fs.readFileSync(path, 'utf8'))
-      : fs.readFileSync(path, 'utf8');
-
-    var html = ejs.render(str, options);
+  ejs.renderFile(path, options, function(err, html) {
 
     var layout = options.layout || (options.locals && options.locals._layout);
-
-    // clear to make sure we don't recurse forever
-    delete options.layout;
 
     if (layout === true) {
       // default layout
       layout = 'layout.ejs';
-    } else if (layout && extname(layout) != '.ejs') {
-      // default extension
-      // FIXME: how to reach 'view engine' from here?
-      layout += '.ejs'
     }
 
     // recurse and use this layout as `body` in the parent
     if (layout) {
-      // find layout path relative to current template
-      var path = join(dirname(path), layout);
+
+      if (extname(layout) != '.ejs') {
+        // default extension
+        // FIXME: how to reach 'view engine' from here?
+        layout += '.ejs'
+      }
+
+      // clear to make sure we don't recurse forever
+      delete options.layout;
       if (options.locals && options.locals._layout) {
          // clear for next iteration (layouts can be nested)
         delete options.locals._layout;
       }
+      delete options.filename;
+
+      // find layout path relative to current template
+      var file = join(dirname(path), layout);
       options.locals.body = html;
-      renderFile(path, options, fn);
+      ejs.renderFile(file, options, fn);
     } else {
       fn(null, html);
     }
-  } catch (err) {
-    fn(err);
-  }
+  });
 
 };
 
