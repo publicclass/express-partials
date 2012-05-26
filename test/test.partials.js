@@ -66,6 +66,10 @@ app.get('/with-blocks',function(req,res,next){
   res.render('with-blocks.ejs',{layout:false});
 })
 
+app.get('/deep-inheritance',function(req,res,next){
+  res.render('inherit-grandchild.ejs');
+})
+
 describe('app',function(){
 
   describe('GET /',function(){
@@ -219,6 +223,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<li><a href="hello.html">there</a></li><p>What\'s up?</p>© 2012');
+          done();
+        })
+    })
+  })
+
+  describe('GET /deep-inheritance',function(){
+    it('should recurse and keep applying layouts until done',function(done){
+      request(app)
+        .get('/deep-inheritance')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>express-partials</title></head><body><i>I am grandchild content.</i><b>I am child content.</b><u>I am parent content.</u></body></html>');
           done();
         })
     })

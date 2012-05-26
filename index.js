@@ -31,7 +31,7 @@ var ejs = require('ejs')
  *
  */
 
-module.exports = function(path, options, fn){
+var renderFile = module.exports = function(path, options, fn){
 
   options.locals.block = block.bind(options);
   options.locals.inherits = inherits.bind(options);
@@ -40,7 +40,7 @@ module.exports = function(path, options, fn){
 
   ejs.renderFile(path, options, function(err, html) {
 
-    var layout = options.layout || (options.locals && options.locals._layout);
+    var layout = (options.locals && options.locals._layout) || options.layout;
 
     // recurse and use this layout as `body` in the parent
     if (layout) {
@@ -67,7 +67,7 @@ module.exports = function(path, options, fn){
       // find layout path relative to current template
       var file = join(dirname(path), layout);
       options.locals.body = html;
-      ejs.renderFile(file, options, fn);
+      renderFile(file, options, fn);
     } else {
       fn(null, html);
     }
