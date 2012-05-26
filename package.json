@@ -7,8 +7,10 @@
   "description": "Express 3.x locals for layout, partial and blocks.",
   "version": "0.1.0",
   "repository": {
-    "url": "https://github.com/randometc/ejs-locals"
+    "type": "git",
+    "url": "https://github.com/randometc/ejs-locals.git"
   },
+  "homepage": "https://github.com/randometc/ejs-locals",
   "engines": {
     "node": "~0.6.8"
   },
