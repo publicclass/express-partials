@@ -42,13 +42,13 @@ module.exports = function(path, options, fn){
 
     var layout = options.layout || (options.locals && options.locals._layout);
 
-    if (layout === true) {
-      // default layout
-      layout = 'layout.ejs';
-    }
-
     // recurse and use this layout as `body` in the parent
     if (layout) {
+
+      if (layout === true) {
+        // default layout
+        layout = 'layout.ejs';
+      }
 
       if (extname(layout) != '.ejs') {
         // default extension
@@ -118,7 +118,14 @@ function resolveObjectName(view){
  *   - any `<root>/<name>`
  *   - partial `<root>/_<name>`
  *
- * @param {View} view
+ * Options:
+ *
+ *   - `cache` store the resolved path for the view, to avoid disk I/O
+ *
+ * @param {String} room, base path for searching for templates
+ * @param {String} view, name of the partial to lookup (without path)
+ * @param {String} ext, type of template to find, with '.'
+ * @param {Object} options, for `options.cache` behavior
  * @return {String}
  * @api private
  */
@@ -171,7 +178,7 @@ function lookup(root, view, ext, options){
  * @param  {String} view
  * @param  {Object|Array} options, collection or object
  * @return {String}
- * @api public
+ * @api private
  */
 
 function partial(view, options){
@@ -297,22 +304,20 @@ function partial(view, options){
  * (`layout` is bound to res in the middleware, so this == res)
  *
  * @param  {String} view
- * @api public
+ * @api private
  */
 function inherits(view){
   this.locals._layout = view;
 }
 
 /**
- * Apply the given `options` to the given `view` to be included
- * in the current template.
+ * Apply the current `options` to the given `view` to be included
+ * in the current template at call time.
  *
- * `options` are bound in the middleware, you just call include())
- * This function is bound to res in the middleware, so this == res
+ * `options` are bound in the middleware, you just call `include('myview')`
  *
- * @param  {Object} options
  * @param  {String} view
- * @api public
+ * @api private
  */
 function include(view) {
   return partial.apply(this, [ view ]);
@@ -337,6 +342,18 @@ Block.prototype = {
   }
 };
 
+/**
+ * Return the block with the given name, create it if necessary.
+ * Optionally append the given html to the block.
+ *
+ * The returned Block can append, prepend or replace the block,
+ * as well as render it when included in a parent template.
+ *
+ * @param  {String} name
+ * @param  {String} html
+ * @return {Block}
+ * @api private
+ */
 function block(name, html) {
   var blocks = this.locals._blocks || (this.locals._blocks = {});
   if (!blocks[name]) {
