@@ -3,6 +3,8 @@ var ejs = require('ejs')
   , exists = path.existsSync
   , resolve = path.resolve
   , extname = path.extname
+  , dirname = path.dirname
+  , join = path.join
   , basename = path.basename
   , fs = require('fs');
 
@@ -10,14 +12,15 @@ var ejs = require('ejs')
 /**
  * Express 3.x Layout & Partial support.
  *
- * The beloved feature from Express 2.x is back as a middleware.
+ * The beloved feature from Express 2.x is back as a template engine.
  *
  * Example:
  *
  *    var express = require('express')
  *      , partials = require('express-partials')
  *      , app = express();
- *    app.use(partials());
+ *    app.engine('ejs', partials);  // use us for all ejs templates
+ *    app.locals({ layout: true }); // if you want layout by default
  *    app.get('/',function(req,res,next){
  *      res.render('index.ejs') // renders layout.ejs with index.ejs as `body`.
  *    })
@@ -28,69 +31,56 @@ var ejs = require('ejs')
  *
  */
 
-module.exports = function(){
-  return function(req,res,next){
-    // res.partial(view,options) -> res.render() (ignores any layouts)
-    res.partial = res.render;
+var renderFile = module.exports = function(path, options, fn){
 
-    // in template partial(view,options)
-    res.locals.partial = partial.bind(res);
+  var key = path + ':string';
 
-    // in template layout override, inherits(view)
-    res.locals.inherits = inherits.bind(res);
+  options.filename = path;
 
-    // in template layout override, inherits(view)
-    res.locals.block = block.bind(res);
+  options.locals.block = block.bind(options);
+  options.locals.inherits = inherits.bind(options);
+  options.locals.include = include.bind(options);
+  options.locals.partial = partial.bind(options);
 
-    // layout support
-    var _render = res.render.bind(res);
-    res.render = function(name, options, fn){
+  try {
+    var str = options.cache
+      ? cache[key] || (cache[key] = fs.readFileSync(path, 'utf8'))
+      : fs.readFileSync(path, 'utf8');
 
-      // in template include (with same locals)
-      res.locals.include = include.bind(res, options);
+    var html = ejs.render(str, options);
 
-      // first render normally
-      _render(name, options, function(err, body){
+    var layout = options.layout || (options.locals && options.locals._layout);
 
-        if( err )
-          return fn ? fn(err) : req.next(err);
+    // clear to make sure we don't recurse forever
+    delete options.layout;
 
-        var layout = options && options.layout;
-
-        // can be overridden by layout local
-        if ('_layout' in res.locals) {
-          layout = res.locals._layout;
-          delete res.locals._layout;
-        }
-
-        // default layout
-        if( layout === true || layout === undefined )
-          layout = 'layout';
-
-        // layout
-        if( layout ){
-
-          options = options || {};
-          options.body = body;
-          options.layout = false;
-
-          // now render the layout
-          var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
-          _render(basename(layout,ext)+ext, options, fn);
-
-        // no layout
-        } else {
-          // (we already handled err above)
-          return fn ? fn(err,body) : res.send(body);
-        }
-      })
+    if (layout === true) {
+      // default layout
+      layout = 'layout.ejs';
+    } else if (layout && extname(layout) != '.ejs') {
+      // default extension
+      // FIXME: how to reach 'view engine' from here?
+      layout += '.ejs'
     }
 
-    // done
-    next();
+    // recurse and use this layout as `body` in the parent
+    if (layout) {
+      // find layout path relative to current template
+      var path = join(dirname(path), layout);
+      if (options.locals && options.locals._layout) {
+         // clear for next iteration (layouts can be nested)
+        delete options.locals._layout;
+      }
+      options.locals.body = html;
+      renderFile(path, options, fn);
+    } else {
+      fn(null, html);
+    }
+  } catch (err) {
+    fn(err);
   }
-}
 
+};
 
 /**
  * Memory cache for resolved object names.
@@ -140,26 +130,29 @@ function resolveObjectName(view){
  * @api private
  */
 
-function lookup(root, view, ext){
-  var name = resolveObjectName(view);
+function lookup(root, view, ext, options){
+  var name = resolveObjectName(view)
+    , key = [ root, view, ext ].join('-');
+
+  if (options.cache && cache[key]) return cache[key];
 
   // Try _ prefix ex: ./views/_<name>.jade
   // taking precedence over the direct path
   view = resolve(root,'_'+name+ext)
-  if( exists(view) ) return view;
+  if( exists(view) ) return options.cache ? cache[key] = view : view;
 
   // Try index ex: ./views/user/index.jade
   view = resolve(root,name,'index'+ext);
-  if( exists(view) ) return view;
+  if( exists(view) ) return options.cache ? cache[key] = view : view;
 
   // Try ../<name>/index ex: ../user/index.jade
   // when calling partial('user') within the same dir
   view = resolve(root,'..',name,'index'+ext);
-  if( exists(view) ) return view;
+  if( exists(view) ) return options.cache ? cache[key] = view : view;
 
   // Try root ex: <root>/user.jade
   view = resolve(root,name+ext);
-  if( exists(view) ) return view;
+  if( exists(view) ) return options.cache ? cache[key] = view : view;
 
   return null;
 };
@@ -189,6 +182,7 @@ function lookup(root, view, ext){
  */
 
 function partial(view, options){
+
   var collection
     , object
     , locals
@@ -227,20 +221,26 @@ function partial(view, options){
   if( locals )
     options.__proto__ = locals;
 
-  // merge app locals into
-  for(var k in this.app.locals)
-    options[k] = options[k] || this.app.locals[k];
+  // merge app locals into options
+  for(var k in this)
+    options[k] = options[k] || this[k];
 
   // extract object name from view
   name = options.as || resolveObjectName(view);
 
-  // find view
-  var root = this.app.get('views') || process.cwd() + '/views'
-    , ext = extname(view) || '.' + (this.app.get('view engine') || 'ejs')
-    , file = lookup(root, view, ext);
+  // find view, relative to this filename
+  // (FIXME: filename is set by ejs engine, other engines may need more help)
+  var root = dirname(options.filename)
+    , ext = extname(view) || '.ejs' // FIXME: how to reach 'view engine' from here?
+    , file = lookup(root, view, ext, options)
+    , key = file + ':string';
 
   // read view
-  var source = fs.readFileSync(file,'utf8');
+  var source = options.cache
+    ? cache[key] || (cache[key] = fs.readFileSync(file, 'utf8'))
+    : fs.readFileSync(file, 'utf8');
+
+  options.filename = file;
 
   // render partial
   function render(){
@@ -315,14 +315,14 @@ function inherits(view){
  * in the current template.
  *
  * `options` are bound in the middleware, you just call include())
- * `layout` is bound to res in the middleware, so this == res
+ * This function is bound to res in the middleware, so this == res
  *
  * @param  {Object} options
  * @param  {String} view
  * @api public
  */
-function include(options, view) {
-  return partial.apply(this, [ view, options ]);
+function include(view) {
+  return partial.apply(this, [ view ]);
 }
 
 function Block() {

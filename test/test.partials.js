@@ -3,8 +3,12 @@ var express = require('express')
   , partials = require('../');
 
 var app = express();
-app.use(partials());
-app.set('views',__dirname + '/fixtures')
+// app.use(partials());
+app.set('views',__dirname + '/fixtures');
+app.engine('ejs', partials);
+app.locals({
+  layout: true
+})
 
 app.locals.use(function(req,res){
   app.locals.hello = 'there';
