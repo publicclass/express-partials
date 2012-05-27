@@ -79,6 +79,10 @@ var renderFile = module.exports = function(path, options, fn){
 
   ejs.renderFile(path, options, function(err, html) {
 
+    if (err) {
+      return fn(err,html)
+    }
+
     var layout = options.locals._layoutFile
 
     // for backward-compatibility, allow options to
