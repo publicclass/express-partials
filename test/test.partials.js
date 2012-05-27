@@ -50,6 +50,10 @@ app.get('/collection/thing',function(req,res,next){
   res.render('collection.ejs',{name: 'thing', list:[{name:'one'},{name:'two'}]})
 })
 
+app.get('/collection/thing-path',function(req,res,next){
+  res.render('collection.ejs',{name: 'path/to/thing', list:[{name:'one'},{name:'two'}]})
+})
+
 app.get('/with-layout',function(req,res,next){
   res.render('with-layout.ejs');
 })
@@ -156,6 +160,18 @@ describe('app',function(){
     it('should render _entry.ejs for every item with layout.ejs as layout',function(done){
       request(app)
         .get('/collection/_entry')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /collection/thing-path',function(){
+    it('should render thing/index.ejs for every item with layout.ejs as layout',function(done){
+      request(app)
+        .get('/collection/thing-path')
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals</title></head><body><ul><li>one</li><li>two</li></ul></body></html>');

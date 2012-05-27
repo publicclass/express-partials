@@ -154,7 +154,7 @@ function resolveObjectName(view){
 };
 
 /**
- * Lookup:
+ * Lookup partial path from base path of current template:
  *
  *   - partial `_<name>`
  *   - any `<name>/index`
@@ -166,37 +166,48 @@ function resolveObjectName(view){
  *
  *   - `cache` store the resolved path for the view, to avoid disk I/O
  *
- * @param {String} room, base path for searching for templates
- * @param {String} view, name of the partial to lookup (without path)
- * @param {String} ext, type of template to find, with '.'
+ * @param {String} root, full base path of calling template
+ * @param {String} partial, name of the partial to lookup (can be a relative path)
  * @param {Object} options, for `options.cache` behavior
  * @return {String}
  * @api private
  */
 
-function lookup(root, view, ext, options){
-  var name = resolveObjectName(view)
-    , key = [ root, view, ext ].join('-');
+function lookup(root, partial, options){
+  var ext = extname(partial) || '.ejs' // FIXME: reach 'view engine' from here?
+    , key = [ root, partial, ext ].join('-');
 
   if (options.cache && cache[key]) return cache[key];
 
-  // Try _ prefix ex: ./views/_<name>.jade
-  // taking precedence over the direct path
-  view = resolve(root,'_'+name+ext)
-  if( exists(view) ) return options.cache ? cache[key] = view : view;
+  // Make sure we use dirname in case of relative partials
+  // ex: for partial('../user') look for /path/to/root/../user.ejs
+  var dir = dirname(partial)
+    , base = basename(partial, ext);
 
-  // Try index ex: ./views/user/index.jade
-  view = resolve(root,name,'index'+ext);
-  if( exists(view) ) return options.cache ? cache[key] = view : view;
+  // _ prefix takes precedence over the direct path
+  // ex: for partial('user') look for /root/_user.ejs
+  partial = resolve(root, dir,'_'+base+ext);
+  if( exists(partial) ) return options.cache ? cache[key] = partial : partial;
 
-  // Try ../<name>/index ex: ../user/index.jade
-  // when calling partial('user') within the same dir
-  view = resolve(root,'..',name,'index'+ext);
-  if( exists(view) ) return options.cache ? cache[key] = view : view;
+  // Try the direct path
+  // ex: for partial('user') look for /root/user.ejs
+  partial = resolve(root, dir, base+ext);
+  if( exists(partial) ) return options.cache ? cache[key] = partial : partial;
 
-  // Try root ex: <root>/user.jade
-  view = resolve(root,name+ext);
-  if( exists(view) ) return options.cache ? cache[key] = view : view;
+  // Try index
+  // ex: for partial('user') look for /root/user/index.ejs
+  partial = resolve(root, dir, base, 'index'+ext);
+  if( exists(partial) ) return options.cache ? cache[key] = partial : partial;
+
+  // FIXME:
+  // * there are other path types that Express 2.0 used to support but
+  //   the structure of the lookup involved View class methods that we
+  //   don't have access to any more
+  // * we probaly need to pass the Express app's views folder path into
+  //   this function if we want to support finding partials relative to
+  //   it as well as relative to the current view
+  // * we have no tests for finding partials that aren't relative to
+  //   the calling view
 
   return null;
 };
@@ -275,8 +286,7 @@ function partial(view, options){
   // find view, relative to this filename
   // (FIXME: filename is set by ejs engine, other engines may need more help)
   var root = dirname(options.filename)
-    , ext = extname(view) || '.ejs' // FIXME: how to reach 'view engine' from here?
-    , file = lookup(root, view, ext, options)
+    , file = lookup(root, view, options)
     , key = file + ':string';
 
   // read view
@@ -297,7 +307,8 @@ function partial(view, options){
       }
     }
     // TODO Support other templates (but it's sync now...)
-    return ejs.render(source, options);
+    var html = ejs.render(source, options);
+    return html;
   }
 
   // Collection support
