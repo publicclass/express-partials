@@ -10,12 +10,13 @@
     "node": "~0.6.8"
   },
   "dependencies": {
-    "ejs": "*"
   },
   "devDependencies": {
     "express": "git://github.com/visionmedia/express.git",
     "mocha": "*",
-    "should": "*"
+    "should": "*",
+    "ejs": "*",
+    "jade": "*"
   },
   "scripts": {
     "test": "mocha -r should"
