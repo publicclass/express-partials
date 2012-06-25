@@ -56,7 +56,7 @@ module.exports = function(){
           options.body = body;
 
           // now render the layout
-          var ext = extname(name) || '.'+res.app.get('view engine');
+          var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
           _render(basename(layout,ext)+ext, options, fn);
         })
 
@@ -239,7 +239,7 @@ function partial(view, options){
 
   // find view
   var root = this.app.get('views') || process.cwd() + '/views'
-    , ext = extname(view) || '.' + this.app.get('view engine')
+    , ext = extname(view) || '.' + (this.app.get('view engine')||'ejs')
     , file = lookup(root, view, ext);
   
   // read view
