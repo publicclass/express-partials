@@ -77,6 +77,9 @@ module.exports = function(){
  */
 
 var register = function(ext,render) {
+  if(ext[0] !== '.') {
+    ext = '.' + ext;
+  }
   register[ext] = render;
 };
 
@@ -88,9 +91,12 @@ module.exports.register = register;
  */
 
 var renderer = function(ext) {
+  if(ext[0] !== '.') {
+    ext = '.' + ext;
+  }
   return register[ext] != null
     ? register[ext]
-    : register[ext] = require(ext).render;
+    : register[ext] = require(ext.slice(1)).render;
 };
 
 module.exports.renderer = renderer;
