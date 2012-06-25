@@ -11,6 +11,8 @@ The beloved feature from Express 2.x is back as a middleware!
 
 
 ## Usage
+
+The simple case:
    
 ```javascript
 var express = require('express')
@@ -19,17 +21,6 @@ var express = require('express')
 
 // load the express-partials middleware
 app.use(partials());
-
-// by default express-partials tries to figure the engine out by using the extension. But in special cases an extension can be registered. Three variants are supported:
-
-// a function
-partials.register('.j',require('jade').render); 
-
-// module (or object with a .render() function)
-partials.register('.j',require('jade')); 
-
-// string (= require(str))
-partials.register('.j','jade'); 
 
 app.get('/',function(req,res,next){
   res.render('index.ejs') 
@@ -47,10 +38,22 @@ app.get('/mobile',function(req,res,next){
 })
 ```
 
+By default express-partials tries to figure the engine out by using the extension of the template. But in special cases an extension can be registered. And this can be done in a few ways:
+
+```javascript
+// a function
+partials.register('.j',require('jade').render); 
+
+// module (or object with a .render() function)
+partials.register('.j',require('jade')); 
+
+// string (= require(str))
+partials.register('.j','jade'); 
+```
 
 ## Template Support
 
-Any synchronous template engine should work fine. But check out the [tests](./test/test.partials.js) for an example of engines tested.
+Any synchronous template engine should work fine. But check out the [tests](./test/test.partials.js) for a few engines tested.
 
 
 ## TODO
@@ -60,9 +63,9 @@ Any synchronous template engine should work fine. But check out the [tests](./te
 
 ## Running Tests
 
-To run the test suite first invoke the following command within the repo, installing the development dependencies:
+To run the test suite first install dependencies with the following command within the repo:
 
-    $ npm install -d
+    $ npm install
 
 then run the tests:
 
