@@ -17,6 +17,9 @@ The beloved feature from Express 2.x is back as a middleware!
      , partials = require('express-partials')
      , app = express();
    app.use(partials());
+
+   // optionally register a template engine (defaults to ejs)
+   partials.register('.jade',require('jade').render);
    
    app.get('/',function(req,res,next){
      res.render('index.ejs') 
@@ -35,15 +38,16 @@ The beloved feature from Express 2.x is back as a middleware!
 ```
 
 
-## Template Support
+## Template Support (tested)
 
-  - `ejs` (actually hard coded right now, but feel free to __fork and help!__)
+  - [ejs](https://github.com/visionmedia/ejs)
+  - [jade](https://github.com/visionmedia/jade)
 
 
 ## TODO
 
  - More Tests!
- - More templates.
+ - More template engines.
 
 
 ## Running Tests

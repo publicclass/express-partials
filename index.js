@@ -74,7 +74,8 @@ module.exports = function(){
   }
 }
 
-/* Allow to register a specific rendering
+/*** 
+ * Allow to register a specific rendering
  * function for a given extension.
  * (Similar to Express 2.x register() function.)
  *
@@ -100,7 +101,8 @@ var register = function(ext,render) {
 
 module.exports.register = register;
 
-/* Automatically assign a render() function
+/**
+ * Automatically assign a render() function
  * from a module of the same name if none
  * has been registered.
  */
