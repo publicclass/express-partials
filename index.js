@@ -1,5 +1,4 @@
-var ejs = require('ejs')
-  , path = require('path')
+var path = require('path')
   , exists = path.existsSync
   , resolve = path.resolve
   , extname = path.extname
@@ -18,6 +17,7 @@ var ejs = require('ejs')
  *      , partials = require('express-partials')
  *      , app = express();
  *    app.use(partials());
+ *    partials.register('coffee',require('coffeekup').render);
  *    app.get('/',function(req,res,next){
  *      res.render('index.ejs') // renders layout.ejs with index.ejs as `body`.
  *    })
@@ -56,7 +56,7 @@ module.exports = function(){
           options.body = body;
 
           // now render the layout
-          var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
+          var ext = extname(name) || '.'+res.app.get('view engine');
           _render(basename(layout,ext)+ext, options, fn);
         })
 
@@ -71,6 +71,29 @@ module.exports = function(){
   }
 }
 
+/* Allow to register a specific rendering
+ * function for a given extension.
+ * (Similar to Express 2.x register() function.)
+ */
+
+var register = function(ext,render) {
+  register[ext] = render;
+};
+
+module.exports.register = register;
+
+/* Automatically assign a render() function
+ * from a module of the same name if none
+ * has been registered.
+ */
+
+var renderer = function(ext) {
+  return register[ext] != null
+    ? register[ext]
+    : register[ext] = require(ext).render;
+};
+
+module.exports.renderer = renderer;
 
 /**
  * Memory cache for resolved object names.
@@ -216,7 +239,7 @@ function partial(view, options){
 
   // find view
   var root = this.app.get('views') || process.cwd() + '/views'
-    , ext = extname(view) || '.' + (this.app.get('view engine') || 'ejs')
+    , ext = extname(view) || '.' + this.app.get('view engine')
     , file = lookup(root, view, ext);
   
   // read view
@@ -232,8 +255,7 @@ function partial(view, options){
         // merge(options, object);
       }
     }
-    // TODO Support other templates (but it's sync now...)
-    return ejs.render(source, options);
+    return renderer(ext)(source, options);
   }
 
   // Collection support
