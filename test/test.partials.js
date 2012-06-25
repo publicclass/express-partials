@@ -42,6 +42,7 @@ app.get('/collection/thing',function(req,res,next){
   res.render('collection.ejs',{name: 'thing', list:[{name:'one'},{name:'two'}]})
 })
 
+/* Use `register` to substitute the file extension. */
 app.engine('.j',require('jade').__express);
 app.get('/register/no-layout',function(req,res,next){
   res.render('index.j',{hello:'world',layout:false})
@@ -49,6 +50,27 @@ app.get('/register/no-layout',function(req,res,next){
 
 app.get('/register',function(req,res,next){
   res.render('index.j',{hello:'world'})
+})
+
+/* Eco is supported by consolidate. Tell Express 3.x
+ * to use that.
+ * express-partials uses Eco's render() automatically.
+ */
+app.engine('.eco',require('consolidate').eco);
+app.get('/eco',function(req,res,next){
+  res.render('index.eco',{hello:'world'})
+})
+
+/* CoffeeCup doesn't support Express 3.x yet, and isn't
+ * handled by consolidate either. We provide our own
+ * renderFile() implementation.
+ * express-partials uses CoffeeCup's render() automatically.
+ */
+app.engine('.coffeecup',function(path,options,callback) {
+  callback(null,require('coffeecup').render(require('fs').readFileSync(path,'utf8'),options));
+});
+app.get('/coffeecup',function(req,res,next){
+  res.render('index.coffeecup',{hello:'world'})
 })
 
 describe('app',function(){
@@ -195,6 +217,30 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<h2>Jade says hello world</h2>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /eco',function(){
+    it('should render index.eco as a Eco template with layout.eco as Eco layout',function(done){
+      request(app)
+        .get('/eco')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>Eco layout</title></head><body><h2>Eco says hello world</h2>\n</body></html>\n');
+          done();
+        })
+    })
+  })
+
+  describe('GET /coffeecup',function(){
+    it('should render index.coffeecup as a CoffeeCup template with layout.coffeecup as CoffeeCup layout',function(done){
+      request(app)
+        .get('/coffeecup')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>CoffeeCup layout</title></head><body><h2>CoffeeCup says hello world</h2></body></html>');
           done();
         })
     })
