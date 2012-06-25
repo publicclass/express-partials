@@ -1,4 +1,10 @@
 
+0.0.4 / 2012-06-25
+==================
+
+  * Improved `partials.register()`. (thanks to Stéphane Alnet)
+
+
 0.0.3 / 2012-06-25
 ==================
 
