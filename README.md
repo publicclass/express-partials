@@ -13,41 +13,49 @@ The beloved feature from Express 2.x is back as a middleware!
 ## Usage
    
 ```javascript
-   var express = require('express')
-     , partials = require('express-partials')
-     , app = express();
-   app.use(partials());
+var express = require('express')
+  , partials = require('express-partials')
+  , app = express();
 
-   // optionally register a template engine (defaults to ejs)
-   partials.register('.jade',require('jade').render);
-   
-   app.get('/',function(req,res,next){
-     res.render('index.ejs') 
-     // -> render layout.ejs with index.ejs as `body`.
-   })
-   
-   app.get('/no-layout',function(req,res,next){
-     res.render('index.ejs',{layout:false})
-     // -> only renders index.ejs
-   })
+// load the express-partials middleware
+app.use(partials());
 
-   app.get('/mobile',function(req,res,next){
-     res.render('index.ejs',{layout:'mobile'})
-     // -> render mobile.ejs with index.ejs as `body`.
-   })
+// by default express-partials tries to figure the engine out by using the extension. But in special cases an extension can be registered. Three variants are supported:
+
+// a function
+partials.register('.j',require('jade').render); 
+
+// module (or object with a .render() function)
+partials.register('.j',require('jade')); 
+
+// string (= require(str))
+partials.register('.j','jade'); 
+
+app.get('/',function(req,res,next){
+  res.render('index.ejs') 
+  // -> render layout.ejs with index.ejs as `body`.
+})
+
+app.get('/no-layout',function(req,res,next){
+  res.render('index.ejs',{layout:false})
+  // -> only renders index.ejs
+})
+
+app.get('/mobile',function(req,res,next){
+  res.render('index.ejs',{layout:'mobile'})
+  // -> render mobile.ejs with index.ejs as `body`.
+})
 ```
 
 
-## Template Support (tested)
+## Template Support
 
-  - [ejs](https://github.com/visionmedia/ejs)
-  - [jade](https://github.com/visionmedia/jade)
+Any synchronous template engine should work fine. But check out the [tests](./test/test.partials.js) for an example of engines tested.
 
 
 ## TODO
 
- - More Tests!
- - More template engines.
+ - Async template engines?
 
 
 ## Running Tests
