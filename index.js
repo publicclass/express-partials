@@ -17,6 +17,9 @@ var path = require('path')
  *      , partials = require('express-partials')
  *      , app = express();
  *    app.use(partials());
+ *    // three ways to register a template engine:
+ *    partials.register('coffee','coffeekup');
+ *    partials.register('coffee',require('coffeekup'));
  *    partials.register('coffee',require('coffeekup').render);
  *    app.get('/',function(req,res,next){
  *      res.render('index.ejs') // renders layout.ejs with index.ejs as `body`.
@@ -74,13 +77,25 @@ module.exports = function(){
 /* Allow to register a specific rendering
  * function for a given extension.
  * (Similar to Express 2.x register() function.)
+ *
+ * The second argument might be:
+ *   a template module's name
+ *   a module with a `render` method
+ *   a synchronous `render` method
  */
 
 var register = function(ext,render) {
   if(ext[0] !== '.') {
     ext = '.' + ext;
   }
-  register[ext] = render;
+  if(typeof render === 'string') {
+    render = require(render);
+  }
+  if(render.render !== null) {
+    register[ext] = render.render;
+  } else {
+    register[ext] = render;
+  }
 };
 
 module.exports.register = register;
