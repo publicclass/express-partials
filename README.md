@@ -16,11 +16,11 @@ The simple case:
    
 ```javascript
 var express = require('express')
-  , partials = require('express-partials')
+  , partials = require('express-partials')()
   , app = express();
 
 // load the express-partials middleware
-app.use(partials());
+app.use(partials);
 
 app.get('/',function(req,res,next){
   res.render('index.ejs') 

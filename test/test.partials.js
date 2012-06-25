@@ -1,9 +1,9 @@
 var express = require('express')
   , request = require('./support/http')
-  , partials = require('../');
+  , partials = require('../')();
 
 var app = express();
-app.use(partials());
+app.use(partials);
 app.set('views',__dirname + '/fixtures')
 
 app.locals.use(function(req,res){

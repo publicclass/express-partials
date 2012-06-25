@@ -32,7 +32,7 @@ var path = require('path')
  */
 
 module.exports = function(){
-  return function(req,res,next){
+  var r = function(req,res,next){
     // res.partial(view,options) -> res.render() (ignores any layouts)
     res.partial = res.render;
 
@@ -71,8 +71,7 @@ module.exports = function(){
 
     // done
     next();
-  }
-}
+  };
 
 /*** 
  * Allow to register a specific rendering
@@ -99,7 +98,7 @@ var register = function(ext,render) {
   }
 };
 
-module.exports.register = register;
+r.register = register;
 
 /**
  * Automatically assign a render() function
@@ -116,7 +115,7 @@ var renderer = function(ext) {
     : register[ext] = require(ext.slice(1)).render;
 };
 
-module.exports.renderer = renderer;
+r.renderer = renderer;
 
 /**
  * Memory cache for resolved object names.
@@ -138,7 +137,7 @@ var cache = {};
  * @api private
  */
 
-function resolveObjectName(view){
+var resolveObjectName = function(view){
   return cache[view] || (cache[view] = view
     .split('/')
     .slice(-1)[0]
@@ -166,7 +165,7 @@ function resolveObjectName(view){
  * @api private
  */
 
-function lookup(root, view, ext){
+var lookup = function(root, view, ext){
   var name = resolveObjectName(view);
 
   // Try _ prefix ex: ./views/_<name>.jade
@@ -214,7 +213,7 @@ function lookup(root, view, ext){
  * @api public
  */
 
-function partial(view, options){
+var partial = function(view, options){
   var collection
     , object
     , locals
@@ -320,4 +319,7 @@ function partial(view, options){
   } else {
     return render();
   }
+};
+
+  return r;
 }
