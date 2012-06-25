@@ -1,0 +1,1 @@
+h2 "CoffeeCup says hello #{@hello}"

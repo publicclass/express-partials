@@ -1,0 +1,1 @@
+<html><head><title>Eco layout</title></head><body><%- @body %></body></html>

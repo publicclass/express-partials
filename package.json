@@ -16,7 +16,10 @@
     "mocha": "*",
     "should": "*",
     "ejs": "*",
-    "jade": "*"
+    "jade": "*",
+    "eco": "*",
+    "coffeecup": "*",
+    "consolidate": "*"
   },
   "scripts": {
     "test": "mocha -r should"
