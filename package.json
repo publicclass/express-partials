@@ -7,7 +7,7 @@
     "url": "https://github.com/publicclass/express-partials"
   },
   "engines": {
-    "node": "~0.6.8"
+    "node": "*"
   },
   "dependencies": {
   },
