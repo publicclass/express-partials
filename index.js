@@ -1,9 +1,9 @@
 var path = require('path')
-  , exists = path.existsSync
+  , fs = require('fs')
+  , exists = fs.existsSync || path.existsSync
   , resolve = path.resolve
   , extname = path.extname
-  , basename = path.basename
-  , fs = require('fs');
+  , basename = path.basename;
 
 
 /**
