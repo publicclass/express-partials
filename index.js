@@ -1,7 +1,7 @@
 var ejs = require('ejs')
   , fs = require('fs')
   , path = require('path')
-  , exists = fs.existsSync
+  , exists = fs.existsSync || path.existsSync
   , resolve = path.resolve
   , extname = path.extname
   , dirname = path.dirname
