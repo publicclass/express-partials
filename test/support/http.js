@@ -4,7 +4,7 @@
  */
 
 var EventEmitter = require('events').EventEmitter
-  , methods = require('express').methods
+  , methods = require('methods')
   , http = require('http');
 
 module.exports = request;
@@ -81,7 +81,7 @@ Request.prototype.end = function(fn){
     this.data.forEach(function(chunk){
       req.write(chunk);
     });
-    
+
     req.on('response', function(res){
       var buf = '';
       res.setEncoding('utf8');

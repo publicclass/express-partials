@@ -1,12 +1,12 @@
 var ejs = require('ejs')
+  , fs = require('fs')
   , path = require('path')
-  , exists = path.existsSync
+  , exists = fs.existsSync
   , resolve = path.resolve
   , extname = path.extname
   , dirname = path.dirname
   , join = path.join
-  , basename = path.basename
-  , fs = require('fs');
+  , basename = path.basename;
 
 /**
  * Express 3.x Layout & Partial support for EJS.
