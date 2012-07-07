@@ -1,6 +1,6 @@
 var path = require('path')
   , fs = require('fs')
-  , exists = fs.existsSync || path.existsSync
+  , exists = fs.existsSync || fs.existsSync
   , resolve = path.resolve
   , extname = path.extname
   , basename = path.basename;
