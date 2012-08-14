@@ -1,12 +1,12 @@
 var ejs = require('ejs')
+  , fs = require('fs')
   , path = require('path')
-  , exists = path.existsSync
+  , exists = fs.existsSync || path.existsSync
   , resolve = path.resolve
   , extname = path.extname
   , dirname = path.dirname
   , join = path.join
-  , basename = path.basename
-  , fs = require('fs');
+  , basename = path.basename;
 
 /**
  * Express 3.x Layout & Partial support for EJS.
@@ -62,6 +62,12 @@ var ejs = require('ejs')
 
 var renderFile = module.exports = function(path, options, fn){
 
+  // Express used to set options.locals for us, but now we do it ourselves
+  // (EJS does some __proto__ magic to expose these funcs/values in the template)
+  if (!options.locals) {
+    options.locals = {};
+  }
+
   if (!options.locals.blocks) {
     // one set of blocks no matter how often we recurse
     var blocks = { scripts: new Block(), stylesheets: new Block() };
@@ -80,10 +86,10 @@ var renderFile = module.exports = function(path, options, fn){
   ejs.renderFile(path, options, function(err, html) {
 
     if (err) {
-      return fn(err,html)
+      return fn(err,html);
     }
 
-    var layout = options.locals._layoutFile
+    var layout = options.locals._layoutFile;
 
     // for backward-compatibility, allow options to
     // set a default layout file for the view or the app
@@ -102,7 +108,7 @@ var renderFile = module.exports = function(path, options, fn){
       // apply default extension
       if (extname(layout) != '.ejs') {
         // FIXME: how to reach 'view engine' from here?
-        layout += '.ejs'
+        layout += '.ejs';
       }
 
       // clear to make sure we don't recurse forever (layouts can be nested)
@@ -151,11 +157,9 @@ function resolveObjectName(view){
     .replace(/^_/, '')
     .replace(/[^a-zA-Z0-9 ]+/g, ' ')
     .split(/ +/).map(function(word, i){
-      return i
-        ? word[0].toUpperCase() + word.substr(1)
-        : word;
+      return i ? word[0].toUpperCase() + word.substr(1) : word;
     }).join(''));
-};
+}
 
 /**
  * Lookup partial path from base path of current template:
@@ -214,7 +218,7 @@ function lookup(root, partial, options){
   //   the calling view
 
   return null;
-};
+}
 
 
 /**
@@ -268,7 +272,7 @@ function partial(view, options){
     if( 'Object' != options.constructor.name ){
       object = options;
       options = {};
-    } else if( options.object != undefined ){
+    } else if( options.object !== undefined ){
       object = options.object;
       delete options.object;
     }
@@ -320,16 +324,17 @@ function partial(view, options){
     var len = collection.length
       , buf = ''
       , keys
-      , key
-      , val;
+      , prop
+      , val
+      , i;
 
     if ('number' == typeof len || Array.isArray(collection)) {
       options.collectionLength = len;
-      for (var i = 0; i < len; ++i) {
+      for (i = 0; i < len; ++i) {
         val = collection[i];
-        options.firstInCollection = i == 0;
+        options.firstInCollection = i === 0;
         options.indexInCollection = i;
-        options.lastInCollection = i == len - 1;
+        options.lastInCollection = i === len - 1;
         object = val;
         buf += render();
       }
@@ -338,13 +343,13 @@ function partial(view, options){
       len = keys.length;
       options.collectionLength = len;
       options.collectionKeys = keys;
-      for (var i = 0; i < len; ++i) {
-        key = keys[i];
-        val = collection[key];
-        options.keyInCollection = key;
-        options.firstInCollection = i == 0;
+      for (i = 0; i < len; ++i) {
+        prop = keys[i];
+        val = collection[prop];
+        options.keyInCollection = prop;
+        options.firstInCollection = i === 0;
         options.indexInCollection = i;
-        options.lastInCollection = i == len - 1;
+        options.lastInCollection = i === len - 1;
         object = val;
         buf += render();
       }
