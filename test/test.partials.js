@@ -82,6 +82,15 @@ app.get('/deep-inheritance-blocks',function(req,res,next){
   res.render('inherit-grandchild-blocks.ejs');
 })
 
+app.get('/non-existent-partial',function(req,res,next){
+  res.render('non-existent-partial.ejs');
+})
+
+// override the default error handler so it doesn't log to console:
+app.use(function(err,req,res,next) {
+  res.send(500, err.stack);
+})
+
 describe('app',function(){
 
   describe('GET /',function(){
@@ -271,6 +280,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals</title><script src="gc.js"></script>\n<script src="c.js"></script><link rel="stylesheet" href="gc.css" />\n<link rel="stylesheet" href="c.css" /></head><body><i>I am grandchild content.</i><b>I am child content.</b><u>I am parent content.</u></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /non-existent-partial',function(){
+    it('should send 500 and error saying a partial was not found',function(done){
+      request(app)
+        .get('/non-existent-partial')
+        .end(function(res){
+          res.should.have.status(500);
+          res.body.should.include('Could not find partial non-existent');
           done();
         })
     })
