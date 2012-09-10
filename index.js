@@ -2,6 +2,7 @@ var path = require('path')
   , fs = require('fs')
   , exists = fs.existsSync || path.existsSync
   , resolve = path.resolve
+  , dirname = path.dirname
   , extname = path.extname
   , basename = path.basename;
 
@@ -60,7 +61,11 @@ module.exports = function(){
 
           // now render the layout
           var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
-          _render(basename(layout,ext)+ext, options, fn);
+          var root = req.app.get('views') || process.cwd() + '/views';
+          var dir = dirname(name) == '.' ? root : resolve(root,dirname(name));
+          layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
+
+          _render(layout, options, fn);
         })
 
       // no layout
