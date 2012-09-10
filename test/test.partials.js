@@ -70,6 +70,10 @@ app.get('/with-include-chain',function(req,res,next){
   res.render('with-include-chain.ejs',{_layoutFile:false, hello:'chain'});
 })
 
+app.get('/with-include-chain-subfolder',function(req,res,next){
+  res.render('with-include-chain-subfolder.ejs',{_layoutFile:false, hello:'subchain'});
+})
+
 app.get('/with-include-there',function(req,res,next){
   res.render('with-include.ejs',{_layoutFile:false});
 })
@@ -268,6 +272,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals-include</title></head><body><h1>chain</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /with-include-chain-subfolder',function(){
+    it('should include and interpolate parent-include-chain.ejs when rendering with-include-chain-subfolder.ejs',function(done){
+      request(app)
+        .get('/with-include-chain-subfolder')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals-include-sub</title></head><body><h1>subchain</h1></body></html>');
           done();
         })
     })
