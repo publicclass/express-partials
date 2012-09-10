@@ -114,6 +114,10 @@ app.get('/non-existent-partial',function(req,res,next){
   res.render('non-existent-partial.ejs');
 })
 
+app.get('/filters',function(req,res,next){
+  res.render('filters.ejs', { hello: 'hello' });
+})
+
 // override the default error handler so it doesn't log to console:
 app.use(function(err,req,res,next) {
   res.send(500, err.stack);
@@ -404,6 +408,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(500);
           res.body.should.include('Could not find partial non-existent');
+          done();
+        })
+    })
+  })
+
+  describe('GET /filters',function(){
+    it('should allow use of default ejs filters like upcase',function(done){
+      request(app)
+        .get('/filters')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>HELLO</h1></body></html>');
           done();
         })
     })
