@@ -1,6 +1,7 @@
 var express = require('express')
   , request = require('./support/http')
-  , engine = require('../');
+  , engine = require('../')
+  , ejs = require('ejs')
 
 var app = express();
 app.set('views',__dirname + '/fixtures');
@@ -116,6 +117,14 @@ app.get('/non-existent-partial',function(req,res,next){
 
 app.get('/filters',function(req,res,next){
   res.render('filters.ejs', { hello: 'hello' });
+})
+
+ejs.filters.embrace = function(s) {
+  return '(' + s + ')';
+}
+
+app.get('/filters-custom',function(req,res,next){
+  res.render('filters-custom.ejs', { hello: 'hello' });
 })
 
 // override the default error handler so it doesn't log to console:
@@ -420,6 +429,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>HELLO</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /filters-custom',function(){
+    it('should allow use of custom ejs filters like embrace',function(done){
+      request(app)
+        .get('/filters-custom')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>HELLO</h1><h1>(hello)</h1></body></html>');
           done();
         })
     })
