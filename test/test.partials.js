@@ -78,6 +78,14 @@ app.get('/with-two-includes',function(req,res,next){
   res.render('with-two-includes.ejs',{_layoutFile:false, hello:'hello'});
 })
 
+app.get('/with-absolute-include',function(req,res,next){
+  res.render('with-absolute-include.ejs',{_layoutFile:false, hello:'hello'});
+})
+
+app.get('/with-absolute-sub-include',function(req,res,next){
+  res.render('with-absolute-sub-include.ejs',{_layoutFile:false, hello:'hello'});
+})
+
 app.get('/with-include-there',function(req,res,next){
   res.render('with-include.ejs',{_layoutFile:false});
 })
@@ -300,6 +308,30 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals-two-includes</title></head><body><h1>hello</h1><h1>Index</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /with-absolute-include',function(){
+    it('should include locals.ejs and interpolate the data correctly',function(done){
+      request(app)
+        .get('/with-absolute-include')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals-abs</title></head><body><h1>hello</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /with-absolute-sub-include',function(){
+    it('should include subfolder/sublocals.ejs and include subfolder/subitem.ejs correctly',function(done){
+      request(app)
+        .get('/with-absolute-sub-include')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals-abs-sub</title></head><body><h1>Index</h1></body></html>');
           done();
         })
     })
