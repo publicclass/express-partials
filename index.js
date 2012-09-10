@@ -91,13 +91,13 @@ module.exports = function(){
  */
 
 var register = function(ext,render) {
-  if(ext[0] !== '.') {
+  if(ext[0] != '.') {
     ext = '.' + ext;
   }
-  if(typeof render === 'string') {
+  if(typeof render == 'string') {
     render = require(render);
   }
-  if(render.render !== null) {
+  if(typeof render.render != 'undefined') {
     register[ext] = render.render;
   } else {
     register[ext] = render;
