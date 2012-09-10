@@ -1,3 +1,10 @@
+
+0.0.6 / 2012-09-10 
+==================
+
+  * Added tests and fixes for layout path resolution. (thanks to Jakub Nešetřil @zzen)
+  * Added Travis-CI.
+
 0.0.5 / 2012-06-29
 ==================
 
