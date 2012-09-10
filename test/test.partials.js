@@ -66,6 +66,10 @@ app.get('/with-include-here',function(req,res,next){
   res.render('with-include.ejs',{_layoutFile:false, hello:'here'});
 })
 
+app.get('/with-include-chain',function(req,res,next){
+  res.render('with-include-chain.ejs',{_layoutFile:false, hello:'chain'});
+})
+
 app.get('/with-include-there',function(req,res,next){
   res.render('with-include.ejs',{_layoutFile:false});
 })
@@ -252,6 +256,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>there</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /with-include-chain',function(){
+    it('should include and interpolate include-chain-2.ejs when rendering with-include-chain.ejs',function(done){
+      request(app)
+        .get('/with-include-chain')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals-include</title></head><body><h1>chain</h1></body></html>');
           done();
         })
     })
