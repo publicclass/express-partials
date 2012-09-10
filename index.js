@@ -101,13 +101,14 @@ var renderFile = module.exports = function(file, options, fn){
 
     if (layout) {
 
-      // apply default layout if only "true" was set
-      if (layout === true) {
-        layout = path.sep + 'layout.ejs';
-      }
-      // apply default extension
+      // use default extension
       var engine = options.settings['view engine'] || 'ejs',
           desiredExt = '.'+engine;
+
+      // apply default layout if only "true" was set
+      if (layout === true) {
+        layout = path.sep + 'layout' + desiredExt;
+      }
       if (extname(layout) !== desiredExt) {
         layout += desiredExt;
       }
@@ -190,7 +191,10 @@ function resolveObjectName(view){
  */
 
 function lookup(root, partial, options){
-  var ext = extname(partial) || '.ejs' // FIXME: reach 'view engine' from here?
+
+  var engine = options.settings['view engine'] || 'ejs'
+    , desiredExt = '.' + engine
+    , ext = extname(partial) || desiredExt
     , key = [ root, partial, ext ].join('-');
 
   if (options.cache && cache[key]) return cache[key];
@@ -401,8 +405,10 @@ function include(view) {
   // find view, relative to this filename (this == original options)
   // (FIXME: options.filename is set by ejs engine, other engines may need more help)
   var root = dirname(this.filename)
+    , engine = this.settings['view engine'] || 'ejs'
+    , desiredExt = '.' + engine
     , ext = extname(view)
-    , file = join(root, view + (ext ? '' : '.ejs'))
+    , file = join(root, view + (ext ? '' : desiredExt))
     , key = file + ':string';
 
   // read view
