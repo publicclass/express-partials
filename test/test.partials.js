@@ -74,6 +74,10 @@ app.get('/with-include-chain-subfolder',function(req,res,next){
   res.render('with-include-chain-subfolder.ejs',{_layoutFile:false, hello:'subchain'});
 })
 
+app.get('/with-two-includes',function(req,res,next){
+  res.render('with-two-includes.ejs',{_layoutFile:false, hello:'hello'});
+})
+
 app.get('/with-include-there',function(req,res,next){
   res.render('with-include.ejs',{_layoutFile:false});
 })
@@ -284,6 +288,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals-include-sub</title></head><body><h1>subchain</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /with-two-includes',function(){
+    it('should include both files and interpolate the same data',function(done){
+      request(app)
+        .get('/with-two-includes')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals-two-includes</title></head><body><h1>hello</h1><h1>Index</h1></body></html>');
           done();
         })
     })
