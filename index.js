@@ -60,7 +60,7 @@ var ejs = require('ejs')
  *
  */
 
-var renderFile = module.exports = function(path, options, fn){
+var renderFile = module.exports = function(file, options, fn){
 
   // Express used to set options.locals for us, but now we do it ourselves
   // (EJS does some __proto__ magic to expose these funcs/values in the template)
@@ -83,7 +83,7 @@ var renderFile = module.exports = function(path, options, fn){
   options.locals.include = include.bind(options);
   options.locals.partial = partial.bind(options);
 
-  ejs.renderFile(path, options, function(err, html) {
+  ejs.renderFile(file, options, function(err, html) {
 
     if (err) {
       return fn(err,html);
@@ -103,12 +103,13 @@ var renderFile = module.exports = function(path, options, fn){
 
       // apply default layout if only "true" was set
       if (layout === true) {
-        layout = 'layout.ejs';
+        layout = path.sep + 'layout.ejs';
       }
       // apply default extension
-      if (extname(layout) != '.ejs') {
-        // FIXME: how to reach 'view engine' from here?
-        layout += '.ejs';
+      var engine = options.settings['view engine'] || 'ejs',
+          desiredExt = '.'+engine;
+      if (extname(layout) !== desiredExt) {
+        layout += desiredExt;
       }
 
       // clear to make sure we don't recurse forever (layouts can be nested)
@@ -117,10 +118,17 @@ var renderFile = module.exports = function(path, options, fn){
       // make sure caching works inside ejs.renderFile/render
       delete options.filename;
 
-      // find layout path relative to current template, then
-      // recurse and use this layout as `body` in the parent
+      if (layout.length > 0 && layout[0] === path.sep) {
+        // if layout is an absolute path, find it relative to view options:
+        layout = join(options.settings.views, layout.slice(1));
+      } else {
+        // otherwise, find layout path relative to current template:
+        layout = resolve(dirname(file), layout);
+      }
+
+      // now recurse and use the current result as `body` in the layout:
       options.locals.body = html;
-      renderFile(join(dirname(path), layout), options, fn);
+      renderFile(layout, options, fn);
     } else {
       // no layout, just do the default:
       fn(null, html);

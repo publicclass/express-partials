@@ -82,6 +82,14 @@ app.get('/deep-inheritance-blocks',function(req,res,next){
   res.render('inherit-grandchild-blocks.ejs');
 })
 
+app.get('/subfolder/subitem',function(req,res,next){
+  res.render('subfolder/subitem.ejs');
+});
+
+app.get('/subfolder/subitem-with-layout',function(req,res,next){
+  res.render('subfolder/subitem-with-layout.ejs');
+});
+
 app.get('/non-existent-partial',function(req,res,next){
   res.render('non-existent-partial.ejs');
 })
@@ -280,6 +288,30 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals</title><script src="gc.js"></script>\n<script src="c.js"></script><link rel="stylesheet" href="gc.css" />\n<link rel="stylesheet" href="c.css" /></head><body><i>I am grandchild content.</i><b>I am child content.</b><u>I am parent content.</u></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /subfolder/subitem',function(){
+    it('should render subfolder/subitem.ejs and still use layout.ejs',function(done){
+      request(app)
+        .get('/subfolder/subitem')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>Index</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /subfolder/subitem-with-layout',function(){
+    it('should render subitem-with-layout.ejs using sub-layout.ejs',function(done){
+      request(app)
+        .get('/subfolder/subitem-with-layout')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>ejs-locals sub-layout</title></head><body><h1>Index</h1></body></html>');
           done();
         })
     })
