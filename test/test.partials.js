@@ -12,12 +12,10 @@ app.engine('ejs', engine);
 // (this was the default in Express 2.0 so it's handy for
 // quick ports and upgrades)
 app.locals({
-  _layoutFile: true
+  _layoutFile: true,
 })
 
-app.locals.use(function(req,res){
-  app.locals.hello = 'there';
-})
+app.locals.hello = 'there';
 
 app.get('/',function(req,res,next){
   res.render('index.ejs')
