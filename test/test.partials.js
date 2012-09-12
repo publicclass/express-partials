@@ -6,8 +6,10 @@ var app = express();
 app.use(partials());
 app.set('views',__dirname + '/fixtures')
 
-app.locals.use(function(req,res){
-  app.locals.hello = 'there';
+app.use(function(req,res,next){
+  res.locals.hello = 'there';
+  res.locals.get_template_path = function() { return __dirname + '/fixtures/subdir/index.ejs'; };
+  next();
 })
 
 app.get('/',function(req,res,next){
@@ -48,6 +50,10 @@ app.get('/subdir',function(req,res,next){
 
 app.get('/subdir-explicit',function(req,res,next){
   res.render('subdir/index.ejs', {layout: 'subdir/layout.ejs', list:[{name:'one'},{name:'two'}]})
+})
+
+app.get('/absolute-path',function(req,res,next){
+  res.render('partial-from-fn.ejs', {})
 })
 
 
@@ -274,6 +280,18 @@ describe('app',function(){
         .end(function(res) {
           res.should.have.status(200);
           res.body.should.equal('<html><title>subdir layout</title><body><h2>Hello World</h2></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /absolute-path',function() {
+    it('should render index.ejs with layout.ejs layout and a partial specified by an absolute path returned by a function', function(done) {
+      request(app)
+        .get('/absolute-path')
+        .end(function(res) {
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>express-partials</title></head><body><h1>partial-from-absolute-path:<h2>Hello World</h2></h1></body></html>');
           done();
         })
     })
