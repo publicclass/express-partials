@@ -42,6 +42,15 @@ app.get('/collection/thing',function(req,res,next){
   res.render('collection.ejs',{name: 'thing', list:[{name:'one'},{name:'two'}]})
 })
 
+app.get('/subdir',function(req,res,next){
+  res.render('subdir/index.ejs')
+})
+
+app.get('/subdir-explicit',function(req,res,next){
+  res.render('subdir/index.ejs', {layout: 'subdir/layout.ejs', list:[{name:'one'},{name:'two'}]})
+})
+
+
 /* Use `register` to substitute the file extension. */
 app.engine('.j',require('jade').__express);
 app.get('/register/no-layout',function(req,res,next){
@@ -241,6 +250,30 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>CoffeeCup layout</title></head><body><h2>CoffeeCup says hello world</h2></body></html>');
+          done();
+        })
+    })
+  })
+  
+  describe('GET /subdir',function() {
+    it('should render index.ejs with layout.ejs (both inside subdir)', function(done) {
+      request(app)
+        .get('/subdir')
+        .end(function(res) {
+          res.should.have.status(200);
+          res.body.should.equal('<html><title>subdir layout</title><body><h2>Hello World</h2></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /subdir-explicit',function() {
+    it('should render index.ejs with layout.ejs (both inside subdir) when layout is specified in locals', function(done) {
+      request(app)
+        .get('/subdir-explicit')
+        .end(function(res) {
+          res.should.have.status(200);
+          res.body.should.equal('<html><title>subdir layout</title><body><h2>Hello World</h2></body></html>');
           done();
         })
     })

@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/publicclass/express-partials.png)](http://travis-ci.org/publicclass/express-partials)
 # express-partials
 
 Express 3.x Layout & Partial support.
