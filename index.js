@@ -192,6 +192,11 @@ function lookup(root, view, ext){
   view = resolve(root,name+ext);
   if( exists(view) ) return view;
 
+  // Try ../<path>/<name> ex: ./views/users/profile
+  // taking precedence over the direct path
+  view = resolve(root,name+ext)
+  if( exists(view) ) return view;
+
   return null;
 };
 
