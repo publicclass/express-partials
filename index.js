@@ -174,6 +174,10 @@ function resolveObjectName(view){
 function lookup(root, view, ext){
   var name = resolveObjectName(view);
 
+  // Try root ex: <root>/user.jade
+  view = resolve(root, view+ext);
+  if( exists(view) ) return view;
+
   // Try _ prefix ex: ./views/_<name>.jade
   // taking precedence over the direct path
   view = resolve(root,'_'+name+ext)
@@ -190,11 +194,6 @@ function lookup(root, view, ext){
 
   // Try root ex: <root>/user.jade
   view = resolve(root,name+ext);
-  if( exists(view) ) return view;
-
-  // Try ../<path>/<name> ex: ./views/users/profile
-  // taking precedence over the direct path
-  view = resolve(root,name+ext)
   if( exists(view) ) return view;
 
   return null;
