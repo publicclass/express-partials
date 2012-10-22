@@ -171,7 +171,7 @@ function resolveObjectName(view){
  * @api private
  */
 
-function lookup(root, view, ext){
+var lookup = function (root, view, ext){
   var name = resolveObjectName(view);
 
   // Try root ex: <root>/user.jade
@@ -198,7 +198,7 @@ function lookup(root, view, ext){
 
   return null;
 };
-
+module.exports.lookup = lookup;
 
 /**
  * Render `view` partial with the given `options`. Optionally a
