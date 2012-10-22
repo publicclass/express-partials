@@ -90,7 +90,7 @@ module.exports = function(){
  *   a synchronous `render` method
  */
 
-var register = function(ext,render) {
+function register(ext,render){
   if(ext[0] != '.') {
     ext = '.' + ext;
   }
@@ -112,8 +112,8 @@ module.exports.register = register;
  * has been registered.
  */
 
-var renderer = function(ext) {
-  if(ext[0] !== '.') {
+function renderer(ext){
+  if(ext[0] !== '.'){
     ext = '.' + ext;
   }
   return register[ext] != null
@@ -171,7 +171,7 @@ function resolveObjectName(view){
  * @api private
  */
 
-var lookup = function (root, view, ext){
+function lookup(root, view, ext){
   var name = resolveObjectName(view);
 
   // Try root ex: <root>/user.jade
