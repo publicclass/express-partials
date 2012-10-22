@@ -266,6 +266,9 @@ function partial(view, options){
   for(var k in this.app.locals)
     options[k] = options[k] || this.app.locals[k];
 
+  // let partials render partials
+  options.partial = partial.bind(this);
+
   // extract object name from view
   name = options.as || resolveObjectName(view);
 
