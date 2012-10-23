@@ -60,10 +60,17 @@ module.exports = function(){
           options.body = body;
 
           // now render the layout
-          var ext = extname(layout) || '.'+(res.app.get('view engine') || 'ejs');
+          var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
           var root = req.app.get('views') || process.cwd() + '/views';
-          var dir = dirname(layout) == '.' ? root : resolve(root,dirname(layout));
-          layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
+          var dir = dirname(name) == '.' ? root : resolve(root,dirname(name));
+          var file = lookup(dir, layout, ext);
+          if( !file ) {
+            // layout not found at default location
+            dir = dirname(layout) == '.' ? root : resolve(root,dirname(layout));
+            file = lookup(dir, basename(layout, ext), ext);
+          }
+          
+          layout = dirname(file)+(path.sep||'/')+basename(layout,ext)+ext;
 
           _render(layout, options, fn);
         })

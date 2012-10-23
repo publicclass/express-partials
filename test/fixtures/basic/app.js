@@ -33,6 +33,14 @@ app.get('/mobile.ejs',function(req,res,next){
   res.render('index.ejs',{layout:'mobile.ejs'})
 })
 
+app.get('/another-layout',function(req,res,next){
+  res.render('index.ejs',{layout:'layouts/another-layout'})
+})
+
+app.get('/another-layout.ejs',function(req,res,next){
+  res.render('index.ejs',{layout:'layouts/another-layout.ejs'})
+})
+
 app.get('/collection/_entry',function(req,res,next){
   res.render('collection.ejs',{name: 'entry', list:[{name:'one'},{name:'two'}]})
 })

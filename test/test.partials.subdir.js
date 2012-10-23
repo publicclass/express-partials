@@ -50,5 +50,29 @@ describe('app',function(){
         })
     })
   })
-
+  
+  describe('GET /layout-subdir',function() {
+    it('should render index.ejs with layout.ejs, with index.ejx inside subdir and layout.ejs inside subdir/layouts', function(done) {
+      request(app)
+        .get('/layout-subdir')
+        .end(function(res) {
+          res.should.have.status(200);
+          res.body.should.equal('<html><title>layout subdir</title><body><h2>Hello World</h2></body></html>');
+          done();
+        })
+    })
+  })
+  
+  describe('GET /layout-subdir.ejs',function() {
+    it('should render index.ejs with layout.ejs, with index.ejx inside subdir and layout.ejs inside subdir/layouts', function(done) {
+      request(app)
+        .get('/layout-subdir.ejs')
+        .end(function(res) {
+          res.should.have.status(200);
+          res.body.should.equal('<html><title>layout subdir</title><body><h2>Hello World</h2></body></html>');
+          done();
+        })
+    })
+  })
+  
 })
