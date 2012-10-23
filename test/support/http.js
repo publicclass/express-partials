@@ -5,7 +5,8 @@
 
 var EventEmitter = require('events').EventEmitter
   , methods = require('methods')
-  , http = require('http');
+  , http = require('http')
+  , onwindows = require('os').type() === 'Windows_NT';
 
 module.exports = request;
 
@@ -20,7 +21,7 @@ function Request(app) {
   this.app = app;
   if (!this.server) {
     this.server = http.Server(app);
-    this.server.listen(0, '127.0.0.1', function(){
+    this.server.listen(0, onwindows === true ? '127.0.0.1' : '0.0.0.0', function(){
       self.addr = self.server.address();
       self.listening = true;
     });
