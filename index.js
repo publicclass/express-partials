@@ -145,7 +145,7 @@ var cache = {};
 
 function resolveObjectName(view){
   return cache[view] || (cache[view] = view
-    .split('/')
+    .split(path.sep || '/')
     .slice(-1)[0]
     .split('.')[0]
     .replace(/^_/, '')
