@@ -60,9 +60,9 @@ module.exports = function(){
           options.body = body;
 
           // now render the layout
-          var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
+          var ext = extname(layout) || '.'+(res.app.get('view engine') || 'ejs');
           var root = req.app.get('views') || process.cwd() + '/views';
-          var dir = dirname(name) == '.' ? root : resolve(root,dirname(name));
+          var dir = dirname(layout) == '.' ? root : resolve(root,dirname(layout));
           layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
 
           _render(layout, options, fn);
