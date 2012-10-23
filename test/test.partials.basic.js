@@ -97,5 +97,28 @@ describe('app',function(){
         })
     })
   })
+  
+  describe('GET /another-layout',function(){
+    it('should render with another-layout.ejs (which is inside layouts subdir) as layout',function(done){
+      request(app)
+        .get('/another-layout')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>express-partials layout subdir</title></head><body><h1>Index</h1></body></html>');
+          done();
+        })
+    })
+  })
 
+  describe('GET /another-layout.ejs',function(){
+    it('should render with another-layout.ejs (which is inside layouts subdir) as layout',function(done){
+      request(app)
+        .get('/another-layout.ejs')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<html><head><title>express-partials layout subdir</title></head><body><h1>Index</h1></body></html>');
+          done();
+        })
+    })
+  })
 })
