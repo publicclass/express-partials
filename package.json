@@ -12,10 +12,10 @@
   "dependencies": {
   },
   "devDependencies": {
-    "express": "3.0.0beta4",
+    "express": "3.0.0",
     "methods": "*",
     "mocha": "*",
-    "should": "*",
+    "supertest": "*",
     "ejs": "*",
     "jade": "*",
     "eco": "*",
@@ -23,6 +23,6 @@
     "consolidate": "*"
   },
   "scripts": {
-    "test": "mocha -r should"
+    "test": "mocha"
   }
 }
