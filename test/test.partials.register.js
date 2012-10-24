@@ -1,5 +1,5 @@
 var app = require('./fixtures/register/app')
-  , request = require('./support/http')
+  , request = require('supertest')
   , partials = require('../');
 
 describe('app',function(){
@@ -9,37 +9,27 @@ describe('app',function(){
       partials.register('.j',require('jade').render);
       request(app)
         .get('/register')
-        .end(function(res){
-          res.should.have.status(200);
-          res.body.should.equal('<html><head><title>Jade layout</title></head><body><h2>Jade says hello world</h2></body></html>');
-          done();
-        })
+        .expect(200)
+        .expect('<html><head><title>Jade layout</title></head><body><h2>Jade says hello world</h2></body></html>')
+        .end(done)
     })
-  })
 
-  describe('GET /register',function(){
     it('should render index.j as a Jade template with layout.j as Jade layout (register: module)',function(done){
       partials.register('.j',require('jade'));
       request(app)
         .get('/register')
-        .end(function(res){
-          res.should.have.status(200);
-          res.body.should.equal('<html><head><title>Jade layout</title></head><body><h2>Jade says hello world</h2></body></html>');
-          done();
-        })
+        .expect(200)
+        .expect('<html><head><title>Jade layout</title></head><body><h2>Jade says hello world</h2></body></html>')
+        .end(done)
     })
-  })
 
-  describe('GET /register',function(){
     it('should render index.j as a Jade template with layout.j as Jade layout (register: name)',function(done){
       partials.register('.j','jade');
       request(app)
         .get('/register')
-        .end(function(res){
-          res.should.have.status(200);
-          res.body.should.equal('<html><head><title>Jade layout</title></head><body><h2>Jade says hello world</h2></body></html>');
-          done();
-        })
+        .expect(200)
+        .expect('<html><head><title>Jade layout</title></head><body><h2>Jade says hello world</h2></body></html>')
+        .end(done)
     })
   })
 
@@ -48,11 +38,9 @@ describe('app',function(){
       partials.register('.j',{});
       request(app)
         .get('/register/no-layout')
-        .end(function(res){
-          res.should.have.status(200);
-          res.body.should.equal('<h2>Jade says hello world</h2>');
-          done();
-        })
+        .expect(200)
+        .expect('<h2>Jade says hello world</h2>')
+        .end(done)
     })
   })
 
@@ -60,11 +48,9 @@ describe('app',function(){
     it('should render index.eco as a Eco template with layout.eco as Eco layout',function(done){
       request(app)
         .get('/eco')
-        .end(function(res){
-          res.should.have.status(200);
-          res.body.should.equal('<html><head><title>Eco layout</title></head><body><h2>Eco says hello world</h2>\n</body></html>\n');
-          done();
-        })
+        .expect(200)
+        .expect('<html><head><title>Eco layout</title></head><body><h2>Eco says hello world</h2>\n</body></html>\n')
+        .end(done)
     })
   })
 
@@ -72,11 +58,9 @@ describe('app',function(){
     it('should render index.coffeecup as a CoffeeCup template with layout.coffeecup as CoffeeCup layout',function(done){
       request(app)
         .get('/coffeecup')
-        .end(function(res){
-          res.should.have.status(200);
-          res.body.should.equal('<html><head><title>CoffeeCup layout</title></head><body><h2>CoffeeCup says hello world</h2></body></html>');
-          done();
-        })
+        .expect(200)
+        .expect('<html><head><title>CoffeeCup layout</title></head><body><h2>CoffeeCup says hello world</h2></body></html>')
+        .end(done)
     })
   })
 

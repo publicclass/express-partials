@@ -5,8 +5,9 @@ var express = require('express')
 app.use(partials());
 app.set('views',__dirname)
 
-app.locals.use(function(req,res){
+app.use(function(req,res,next){
   app.locals.hello = 'there';
+  next()
 })
 
 app.get('/',function(req,res,next){
