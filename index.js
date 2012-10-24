@@ -266,6 +266,10 @@ function partial(view, options){
   for(var k in this.app.locals)
     options[k] = options[k] || this.app.locals[k];
 
+  // merge locals, which as set using app.use(function(...){ res.locals = X; }) 
+  for(var k in this.req.res.locals)
+    options[k] = options[k] || this.req.res.locals[k];
+
   // let partials render partials
   options.partial = partial.bind(this);
 
