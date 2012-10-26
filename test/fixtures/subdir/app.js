@@ -29,3 +29,11 @@ app.get('/subdir-a-view',function(req,res,next){
 app.get('/subdir-aView',function(req,res,next){
   res.render('subdir/aView.ejs')
 })
+
+app.get('/layout-subdir',function(req,res,next){
+  res.render('subdir/index.ejs',{layout: 'subdir/layouts/another-layout'})
+})
+
+app.get('/layout-subdir.ejs',function(req,res,next){
+  res.render('subdir/index.ejs',{layout: 'subdir/layouts/another-layout.ejs'})
+})
