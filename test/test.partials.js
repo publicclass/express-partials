@@ -128,6 +128,8 @@ app.get('/filters-custom',function(req,res,next){
 // override the default error handler so it doesn't log to console:
 app.use(function(err,req,res,next) {
   res.send(500, err.stack);
+  // console.log(err.stack);
+  // next();
 })
 
 describe('app',function(){

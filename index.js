@@ -80,7 +80,6 @@ var renderFile = module.exports = function(file, options, fn){
   }
   // override locals for layout/include/partial bound to current options
   options.locals.layout  = layout.bind(options);
-  options.locals.include = include.bind(options);
   options.locals.partial = partial.bind(options);
 
   ejs.renderFile(file, options, function(err, html) {
@@ -389,37 +388,6 @@ function partial(view, options){
  */
 function layout(view){
   this.locals._layoutFile = view;
-}
-
-/**
- * Apply the current `options` to the given `view` to be included
- * in the current template at call time.
- *
- * `options` are bound in renderFile, you just call `include('myview')`
- *
- * @param  {String} view
- * @api private
- */
-function include(view) {
-
-  // find view, relative to this filename (this == original options)
-  // (FIXME: options.filename is set by ejs engine, other engines may need more help)
-  var root = dirname(this.filename)
-    , engine = this.settings['view engine'] || 'ejs'
-    , desiredExt = '.' + engine
-    , ext = extname(view)
-    , file = join(root, view + (ext ? '' : desiredExt))
-    , key = file + ':string';
-
-  // read view
-  var source = this.cache
-    ? cache[key] || (cache[key] = fs.readFileSync(file, 'utf8'))
-    : fs.readFileSync(file, 'utf8');
-
-  this.filename = file;
-
-  // TODO Support other templates (but it's sync now...)
-  return ejs.render(source, this);
 }
 
 function Block() {
