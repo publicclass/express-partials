@@ -317,6 +317,9 @@ function partial(view, options){
 
   options.filename = file;
 
+  // re-bind partial for relative partial paths
+  options.partial = partial.bind(options);
+
   // render partial
   function render(){
     if (object) {

@@ -21,6 +21,23 @@ app.get('/',function(req,res,next){
   res.render('index.ejs')
 })
 
+app.get('/blog',function(req,res,next){
+  res.render('blog/home.ejs', {
+    _layoutFile:false,
+    user: { name: 'Tom' }, 
+    posts: [ 
+      { 
+        text: '1', 
+        comments: [ { text: '1.1' }, { text: '1.2' } ] 
+      }, 
+      { 
+        text: '2', 
+        comments: [ { text: '2.1' }, { text: '2.2' }, { text: '2.3' } ] 
+      } 
+    ]    
+  })
+})
+
 app.get('/no-layout',function(req,res,next){
   res.render('index.ejs',{_layoutFile:false})
 })
@@ -127,9 +144,8 @@ app.get('/filters-custom',function(req,res,next){
 
 // override the default error handler so it doesn't log to console:
 app.use(function(err,req,res,next) {
-  res.send(500, err.stack);
   // console.log(err.stack);
-  // next();
+  res.send(500, err.stack);
 })
 
 describe('app',function(){
@@ -141,6 +157,18 @@ describe('app',function(){
         .end(function(res){
           res.should.have.status(200);
           res.body.should.equal('<html><head><title>ejs-locals</title></head><body><h1>Index</h1></body></html>');
+          done();
+        })
+    })
+  })
+
+  describe('GET /blog',function(){
+    it('should render all the fiddly partials',function(done){
+      request(app)
+        .get('/blog')
+        .end(function(res){
+          res.should.have.status(200);
+          res.body.should.equal('<h1>Tom</h1><ul><li>1<ul><li>1.1</li><li>1.2</li></ul></li><li>2<ul><li>2.1</li><li>2.2</li><li>2.3</li></ul></li></ul>');
           done();
         })
     })
