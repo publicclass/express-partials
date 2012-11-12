@@ -15,7 +15,7 @@
     "node": ">=0.6.0"
   },
   "dependencies": {
-    "ejs": "0.7.x"
+    "ejs": "0.8.x"
   },
   "devDependencies": {
     "express": "~3.0.0",
@@ -24,6 +24,6 @@
     "methods": "0.0.1"
   },
   "scripts": {
-    "test": "mocha -r should"
+    "test": "mocha -r should -R spec"
   }
 }

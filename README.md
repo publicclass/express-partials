@@ -104,10 +104,6 @@ When called anywhere inside a template, adds the given view to that template usi
 
 For example, if you do `<%-partial('thing',things)%>` then each item in the `things` Array is passed to `thing.ejs` with the name `thing`. If you rename the template, the local name of each item will correspond to the template name.
 
-### `include(view)`
-
-When called anywhere inside a template, adds the given view to that template using the current options and locals. e.g. `<%-include('view.ejs')%>
-
 ### `block(name,html)`
 
 When called anywhere inside a template, adds the given html to the named block. In the layout you can then do `<%-block('foo')%> to render all the html for that block.
@@ -156,6 +152,15 @@ Express 2.0 had similar functionality built in, using `{ layout: 'view' }` as an
 
 
 And/or pass `_layoutFile: true` in the options when you call `res.render(...)`.
+
+## Whither Include?
+
+Previous versions of this library had an `include` function. This is now supported directly by EJS, albeit with a different syntax. For `ejs-locals` 1.0+ simply do:
+
+### `<% include path/view %>`
+
+When called anywhere inside a template, this adds the given view to that template using the current options and locals. This is built-in to [EJS](https://github.com/visionmedia/ejs) 0.8+.
+
 
 
 ## Credits
