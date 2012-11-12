@@ -1,10 +1,8 @@
 # ejs-locals
 
-Express 3.x `layout`, `partial` and `block` template functions for the EJS template engine.
+Express 3.x `layout`, `partial` and `block` template functions for the EJS template engine. 
 
-__NB:-__ This version (0.2.6) requires EJS 0.7.x because 0.8.x has an `include` function
-which conflicts with the `include` function here. I receommend updating to EJS 0.8.x and
-ejs-locals 1.0.
+Previously also offered `include` but you should use EJS 0.8.x's own method for that now.
 
 ## Installation
 
@@ -161,11 +159,9 @@ Previous versions of this library had an `include` function. This is now support
 
 When called anywhere inside a template, this adds the given view to that template using the current options and locals. This is built-in to [EJS](https://github.com/visionmedia/ejs) 0.8+.
 
-
-
 ## Credits
 
-This library is a fork from Robert Sk&ouml;ld's [express-partials](https://github.com/publicclass/express-partials), and the partial function remains relatively untouched from there (aside from cache support).
+This library is a fork from Robert Sk&ouml;ld's [express-partials](https://github.com/publicclass/express-partials), and the partial function remains relatively untouched from there (aside from cache support). Robert is still updating his library and it now supports other template engines - check it out!
 
 The blocks idea and syntax comes from Aseem Kishore's [express-blocks](https://github.com/aseemk/express-blocks)
 
