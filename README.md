@@ -49,7 +49,7 @@ And a layout, `boilerplate.ejs`:
 When rendered by an Express 3.0 app:
 
     var express = require('express')
-      , engine = require('../')
+      , engine = require('ejs-locals')
       , app = express();
 
     // use ejs-locals for all ejs templates:
