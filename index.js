@@ -12,7 +12,7 @@ var ejs = require('ejs')
  * Express 3.x Layout & Partial support for EJS.
  *
  * The `partial` feature from Express 2.x is back as a template engine,
- * along with support for `layout`, `include` and `block/script/stylesheet`.
+ * along with support for `layout` and `block/script/stylesheet`.
  *
  *
  * Example index.ejs:
@@ -78,7 +78,7 @@ var renderFile = module.exports = function(file, options, fn){
     options.locals.stylesheet = stylesheet.bind(blocks.stylesheets);
     options.locals.script = script.bind(blocks.scripts);
   }
-  // override locals for layout/include/partial bound to current options
+  // override locals for layout/partial bound to current options
   options.locals.layout  = layout.bind(options);
   options.locals.partial = partial.bind(options);
 
@@ -381,7 +381,7 @@ function partial(view, options){
  * added by child templates.
  *
  * `options` are bound  to `this` in renderFile, you just call
- * `include('myview')`
+ * `layout('myview')`
  *
  * @param  {String} view
  * @api private
