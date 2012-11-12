@@ -2,6 +2,9 @@
 
 Express 3.x `layout`, `partial` and `block` template functions for the EJS template engine.
 
+__NB:-__ This version (0.2.6) requires EJS 0.7.x because 0.8.x has an `include` function
+which conflicts with the `include` function here. I receommend updating to EJS 0.8.x and
+ejs-locals 1.0.
 
 ## Installation
 
