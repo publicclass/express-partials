@@ -54,7 +54,7 @@ partials.register('.j','jade');
 
 ## Template Support
 
-Any synchronous template engine should work fine. But check out the [tests](./test/test.partials.js) for a few engines tested.
+Any synchronous template engine should work fine. But check out the [tests](./test/test.partials.register.js) for a few engines tested.
 
 
 ## TODO
