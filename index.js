@@ -284,6 +284,9 @@ function partial(view, options){
   // read view
   var source = fs.readFileSync(file,'utf8');
 
+  // set filename option for renderer (Jade requires this for includes)
+  options.filename = file;
+
   // render partial
   function render(){
     if (object) {
