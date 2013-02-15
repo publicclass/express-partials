@@ -67,7 +67,7 @@ module.exports = function(){
           
           // See if we even have a layout to use
           // If so, render it. If not, then fallback to just the original template
-          if (fs.existsSync(filename)) {
+          if (exists(filename)) {
             layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
             _render(layout, options, fn);
           } else {
