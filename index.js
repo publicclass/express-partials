@@ -59,13 +59,20 @@ module.exports = function(){
           options = options || {};
           options.body = body;
 
-          // now render the layout
+          // calculate the layout vars
           var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
           var root = req.app.get('views') || process.cwd() + '/views';
           var dir = dirname(name) == '.' ? root : resolve(root,dirname(name));
-          layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
-
-          _render(layout, options, fn);
+          var filename = dir+(path.sep||'/')+basename(layout,ext)+ext
+          
+          // See if we even have a layout to use
+          // If so, render it. If not, then fallback to just the original template
+          if (exists(filename)) {
+            layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
+            _render(layout, options, fn);
+          } else {
+            _render(name, options, fn);
+          }
         })
 
       // no layout
