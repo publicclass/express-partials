@@ -59,13 +59,20 @@ module.exports = function(){
           options = options || {};
           options.body = body;
 
-          // now render the layout
+          // calculate the layout vars
           var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
           var root = req.app.get('views') || process.cwd() + '/views';
           var dir = dirname(name) == '.' ? root : resolve(root,dirname(name));
-          layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
-
-          _render(layout, options, fn);
+          var filename = dir+(path.sep||'/')+basename(layout,ext)+ext
+          
+          // See if we even have a layout to use
+          // If so, render it. If not, then fallback to just the original template
+          if (exists(filename)) {
+            layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
+            _render(layout, options, fn);
+          } else {
+            _render(name, options, fn);
+          }
         })
 
       // no layout
@@ -145,7 +152,7 @@ var cache = {};
 
 function resolveObjectName(view){
   return cache[view] || (cache[view] = view
-    .split('/')
+    .split(path.sep || '/')
     .slice(-1)[0]
     .split('.')[0]
     .replace(/^_/, '')
@@ -266,6 +273,10 @@ function partial(view, options){
   for(var k in this.app.locals)
     options[k] = options[k] || this.app.locals[k];
 
+  // merge locals, which as set using app.use(function(...){ res.locals = X; }) 
+  for(var k in this.req.res.locals)
+    options[k] = options[k] || this.req.res.locals[k];
+
   // let partials render partials
   options.partial = partial.bind(this);
 
@@ -279,6 +290,9 @@ function partial(view, options){
   
   // read view
   var source = fs.readFileSync(file,'utf8');
+
+  // set filename option for renderer (Jade requires this for includes)
+  options.filename = file;
 
   // render partial
   function render(){

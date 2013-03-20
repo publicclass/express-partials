@@ -2,7 +2,7 @@
   "author": "Robert Sköld <robert@publicclass.se> (http://publicclass.se)",
   "name": "express-partials",
   "description": "Express 3.x Layout & Partial support.",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "repository": {
     "url": "https://github.com/publicclass/express-partials"
   },
@@ -12,10 +12,10 @@
   "dependencies": {
   },
   "devDependencies": {
-    "express": "3.0.0beta4",
+    "express": "3.0.0",
     "methods": "*",
     "mocha": "*",
-    "should": "*",
+    "supertest": "*",
     "ejs": "*",
     "jade": "*",
     "eco": "*",
@@ -23,6 +23,6 @@
     "consolidate": "*"
   },
   "scripts": {
-    "test": "mocha -r should"
+    "test": "mocha"
   }
 }
