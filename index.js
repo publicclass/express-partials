@@ -62,16 +62,25 @@ module.exports = function(){
           // calculate the layout vars
           var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
           var root = req.app.get('views') || process.cwd() + '/views';
-          var dir = dirname(name) == '.' ? root : resolve(root,dirname(name));
-          var filename = dir+(path.sep||'/')+basename(layout,ext)+ext
-          
+          var dir = dirname(layout) == '.' ? root : resolve(root,dirname(layout));
+          var filename = dir+(path.sep||'/')+basename(layout,ext)+ext;
+
           // See if we even have a layout to use
           // If so, render it. If not, then fallback to just the original template
           if (exists(filename)) {
             layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
             _render(layout, options, fn);
           } else {
-            _render(name, options, fn);
+            // layout may be in the same folder than the view
+            dir = dirname(name) == '.' ? root : resolve(root,dirname(name));
+            filename = dir+(path.sep||'/')+basename(layout,ext)+ext;
+
+            if(exists(filename)) {
+              layout = dirname(lookup(dir, layout, ext))+(path.sep||'/')+basename(layout,ext)+ext;
+              _render(layout, options, fn);
+            } else {
+              _render(name, options, fn);
+            }
           }
         })
 
@@ -180,9 +189,14 @@ function resolveObjectName(view){
 
 function lookup(root, view, ext){
   var name = resolveObjectName(view);
+  var original = view;
 
   // Try root ex: <root>/user.jade
-  view = resolve(root, view+ext);
+  view = resolve(root, basename(original,ext)+ext);
+  if( exists(view) ) return view;
+
+  // Try subdir ex: <root>/subdir/user.jade
+  view = resolve(root, dirname(original), basename(original,ext)+ext);
   if( exists(view) ) return view;
 
   // Try _ prefix ex: ./views/_<name>.jade

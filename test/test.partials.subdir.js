@@ -32,6 +32,16 @@ describe('app',function(){
         .end(done)
     })
   })
+
+  describe('GET /subdir-a-layout',function() {
+    it('should render a-view.ejs (inside subdir) with layout.ejs (inside subdir/dir)', function(done) {
+      request(app)
+        .get('/subdir-a-layout')
+        .expect(200)
+        .expect('<html><title>A layout</title><body><h2>A view</h2></body></html>')
+        .end(done)
+    })
+  })
   
   describe.skip('GET /subdir-aView',function() {
     it('should render a-view.ejs with layout.ejs (both inside subdir)', function(done) {
