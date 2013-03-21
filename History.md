@@ -1,4 +1,10 @@
 
+0.1.1 / 2013-03-21
+==================
+
+  * Fixed issue with layouts in a subdirectory (#35 by rguerreiro)
+  * Made tests run on windows (by rguerreiro)
+
 0.1.0 / 2013-03-20
 ==================
 
