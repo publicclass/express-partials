@@ -26,6 +26,10 @@ app.get('/subdir-a-view',function(req,res,next){
   res.render('subdir/a-view.ejs')
 })
 
+app.get('/subdir-a-layout',function(req,res,next){
+  res.render('subdir/a-view.ejs', { layout: 'subdir/dir/a-layout.ejs' })
+})
+
 app.get('/subdir-aView',function(req,res,next){
   res.render('subdir/aView.ejs')
 })
