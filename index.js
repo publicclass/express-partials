@@ -250,6 +250,153 @@ function partial(view, options){
     , locals
     , name;
 
+	console.log(options);
+
+  // parse options
+  if( options ){
+  
+    // string/obj or collection
+  	if ( typeof options === 'string' || typeof options === 'object' ) {
+  	  collection = [ options ];
+  	  options = {};
+  	} else if( options.collection ){
+      collection = options.collection;
+      delete options.collection;
+    } else if( 'length' in options ){
+      collection = options;
+      options = {};
+    } 
+
+    // locals
+    if( options.locals ){
+      locals = options.locals;
+      delete options.locals;
+    }
+
+    // object
+    if( 'Object' != options.constructor.name ){
+      object = options;
+      options = {};
+    } else if( options.object != undefined ){
+      object = options.object;
+      delete options.object;
+    }
+  } else {
+    options = {};
+  }
+
+  // merge locals into options
+  if( locals )
+    options.__proto__ = locals;
+
+  // merge app locals into 
+  for(var k in this.app.locals)
+    options[k] = options[k] || this.app.locals[k];
+
+  // merge locals, which as set using app.use(function(...){ res.locals = X; }) 
+  for(var k in this.req.res.locals)
+    options[k] = options[k] || this.req.res.locals[k];
+
+  // let partials render partials
+  options.partial = partial.bind(this);
+
+  // extract object name from view
+  name = options.as || resolveObjectName(view);
+
+  // find view
+  var root = this.app.get('views') || process.cwd() + '/views'
+    , ext = extname(view) || '.' + (this.app.get('view engine')||'ejs')
+    , file = lookup(root, view, ext);
+  
+  // read view
+  var source = fs.readFileSync(file,'utf8');
+
+  // set filename option for renderer (Jade requires this for includes)
+  options.filename = file;
+
+  // render partial
+  function render(){
+    if (object) {
+      if ('string' == typeof name) {
+        options[name] = object;
+      } else if (name === global) {
+        // wtf?
+        // merge(options, object);
+      }
+    }
+    return renderer(ext)(source, options);
+  }
+
+  // Collection support
+  if (collection) {
+    var len = collection.length
+      , buf = ''
+      , keys
+      , key
+      , val;
+
+    if ('number' == typeof len || Array.isArray(collection)) {
+      options.collectionLength = len;
+      for (var i = 0; i < len; ++i) {
+        val = collection[i];
+        options.firstInCollection = i == 0;
+        options.indexInCollection = i;
+        options.lastInCollection = i == len - 1;
+        object = val;
+        buf += render();
+      }
+    } else {
+      keys = Object.keys(collection);
+      len = keys.length;
+      options.collectionLength = len;
+      options.collectionKeys = keys;
+      for (var i = 0; i < len; ++i) {
+        key = keys[i];
+        val = collection[key];
+        options.keyInCollection = key;
+        options.firstInCollection = i == 0;
+        options.indexInCollection = i;
+        options.lastInCollection = i == len - 1;
+        object = val;
+        buf += render();
+      }
+    }
+
+    return buf;
+  } else {
+    return render();
+  }
+}
+
+/**
+ * Render `view` partial with the given `options`. Optionally a
+ * callback `fn(err, str)` may be passed instead of writing to
+ * the socket.
+ *
+ * Options:
+ *
+ *   - `object` Single object with name derived from the view (unless `as` is present)
+ *
+ *   - `as` Variable name for each `collection` value, defaults to the view name.
+ *     * as: 'something' will add the `something` local variable
+ *     * as: this will use the collection value as the template context
+ *     * as: global will merge the collection value's properties with `locals`
+ *
+ *   - `collection` Array of objects, the name is derived from the view name itself.
+ *     For example _video.html_ will have a object _video_ available to it.
+ *
+ * @param  {String} view
+ * @param  {Object|Array} options, collection or object
+ * @return {String}
+ * @api public
+ */
+
+function snippet(view, options){
+  var collection
+    , object
+    , locals
+    , name;
+
   // parse options
   if( options ){
     // collection
