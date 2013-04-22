@@ -252,8 +252,11 @@ function partial(view, options){
 
   // parse options
   if( options ){
-    // collection
-    if( options.collection ){
+    // if single option, else if collection
+  	if ( !(options instanceof Array) ) {
+  	  collection = [ options ];
+  	  options = {};
+  	} else if( options.collection ){
       collection = options.collection;
       delete options.collection;
     } else if( 'length' in options ){
