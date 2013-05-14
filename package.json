@@ -17,6 +17,7 @@
     "mocha": "*",
     "supertest": "*",
     "ejs": "*",
+    "hamljs": "*",
     "jade": "*",
     "eco": "*",
     "coffeecup": "*",
