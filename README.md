@@ -52,6 +52,8 @@ partials.register('.j',require('jade'));
 partials.register('.j','jade'); 
 ```
 
+For an example on how to use partials in the first place I'd recommend you checking out the [Express 2.x ejs example](https://github.com/visionmedia/express/tree/2.x/examples/ejs).
+
 ## Template Support
 
 Any synchronous template engine should work fine. But check out the [tests](./test/test.partials.register.js) for a few engines tested.
