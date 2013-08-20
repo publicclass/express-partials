@@ -32,7 +32,7 @@ var path = require('path')
  *
  */
 
-module.exports = function(){
+module.exports = function(defaultLayout){
   return function(req,res,next){
     // res.partial(view,options) -> res.render() (ignores any layouts)
     res.partial = res.render;
@@ -47,7 +47,7 @@ module.exports = function(){
 
       // default layout
       if( layout === true || layout === undefined )
-        layout = 'layout';
+        layout = defaultLayout || 'layout';
       
       // layout
       if( layout ){
