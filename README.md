@@ -1,5 +1,12 @@
 # ejs-locals
 
+## Status
+
+This library is *unmaintained*, sorry. I recommend a fully-featured and actively-maintained 
+alternative such as https://github.com/linkedin/dustjs or https://github.com/baryshev/ect
+
+## About
+
 Express 3.x `layout`, `partial` and `block` template functions for the EJS template engine. 
 
 Previously also offered `include` but you should use EJS 0.8.x's own method for that now.
