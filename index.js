@@ -46,8 +46,11 @@ module.exports = function(){
       var layout = options && options.layout;
 
       // default layout
-      if( layout === true || layout === undefined )
-        layout = 'layout';
+      if( layout === true || layout === undefined ) {
+        // Try to find default layout in view options, if not found, seek for 'layout'
+        var viewOptions = res.app.get('view options');
+        layout = viewOptions && viewOptions.defaultLayout || 'layout';
+      }
       
       // layout
       if( layout ){
