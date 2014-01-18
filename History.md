@@ -1,4 +1,10 @@
 
+0.2.0 / 2014-01-18
+==================
+
+ * Add option to specify global default layout path
+ * Added a link to express 2.x ejs example. Closes #39.
+
 0.1.1 / 2013-03-21
 ==================
 
