@@ -1,4 +1,9 @@
 
+0.3.0 / 2014-06-30
+==================
+
+* Added locals to options to properly render haml
+
 0.2.0 / 2014-01-18
 ==================
 
