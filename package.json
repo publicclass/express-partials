@@ -15,7 +15,7 @@
     "express": "3.0.0",
     "methods": "*",
     "mocha": "*",
-    "supertest": "*",
+    "supertest": "0.4.0",
     "ejs": "*",
     "hamljs": "*",
     "jade": "*",
