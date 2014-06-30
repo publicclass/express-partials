@@ -321,6 +321,7 @@ function partial(view, options){
         // merge(options, object);
       }
     }
+    options.locals = locals
     return renderer(ext)(source, options);
   }
 
