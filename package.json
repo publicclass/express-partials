@@ -4,7 +4,7 @@
   "description": "Express 3.x Layout & Partial support.",
   "version": "0.3.0",
   "repository": {
-    "url": "https://github.com/publicclass/express-partials"
+    "url": "https://github.com/publicclass/express-partials.git"
   },
   "engines": {
     "node": "*"
