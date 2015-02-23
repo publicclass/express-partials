@@ -61,7 +61,7 @@ module.exports = function(){
 
           options = options || {};
           options.body = body;
-          options.data['body'] = body; // hack to work with flatiron / plates
+          if (options.data) options.data['body'] = body; // hack to work with flatiron / plates
 
           // calculate the layout vars
           var ext = extname(name) || '.'+(res.app.get('view engine') || 'ejs');
