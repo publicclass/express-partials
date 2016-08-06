@@ -13,7 +13,7 @@ var path = require('path')
  * The beloved feature from Express 2.x is back as a middleware.
  *
  * Example:
- *    
+ *
  *    var express = require('express')
  *      , partials = require('express-partials')
  *      , app = express();
@@ -25,7 +25,7 @@ var path = require('path')
  *    app.get('/',function(req,res,next){
  *      res.render('index.ejs') // renders layout.ejs with index.ejs as `body`.
  *    })
- * 
+ *
  * Options:
  *
  *    none
@@ -51,7 +51,7 @@ module.exports = function(){
         var viewOptions = res.app.get('view options');
         layout = viewOptions && viewOptions.defaultLayout || 'layout';
       }
-      
+
       // layout
       if( layout ){
         // first render normally
@@ -98,7 +98,7 @@ module.exports = function(){
   }
 }
 
-/*** 
+/***
  * Allow to register a specific rendering
  * function for a given extension.
  * (Similar to Express 2.x register() function.)
@@ -194,33 +194,35 @@ function lookup(root, view, ext){
   var name = resolveObjectName(view);
   var original = view;
 
-  // Try root ex: <root>/user.jade
-  view = resolve(root, basename(original,ext)+ext);
-  if( exists(view) ) return view;
+  (typeof root == 'string' ? [root] : root).some(function(root) {
+    // Try root ex: <root>/user.jade
+    view = resolve(root, basename(original,ext)+ext);
+    if( exists(view) ) return true;
 
-  // Try subdir ex: <root>/subdir/user.jade
-  view = resolve(root, dirname(original), basename(original,ext)+ext);
-  if( exists(view) ) return view;
+    // Try subdir ex: <root>/subdir/user.jade
+    view = resolve(root, dirname(original), basename(original,ext)+ext);
+    if( exists(view) ) return true;
 
-  // Try _ prefix ex: ./views/_<name>.jade
-  // taking precedence over the direct path
-  view = resolve(root,'_'+name+ext)
-  if( exists(view) ) return view;
+    // Try _ prefix ex: ./views/_<name>.jade
+    // taking precedence over the direct path
+    view = resolve(root,'_'+name+ext)
+    if( exists(view) ) return true;
 
-  // Try index ex: ./views/user/index.jade
-  view = resolve(root,name,'index'+ext);
-  if( exists(view) ) return view;
+    // Try index ex: ./views/user/index.jade
+    view = resolve(root,name,'index'+ext);
+    if( exists(view) ) return true;
 
-  // Try ../<name>/index ex: ../user/index.jade
-  // when calling partial('user') within the same dir
-  view = resolve(root,'..',name,'index'+ext);
-  if( exists(view) ) return view;
+    // Try ../<name>/index ex: ../user/index.jade
+    // when calling partial('user') within the same dir
+    view = resolve(root,'..',name,'index'+ext);
+    if( exists(view) ) return true;
 
-  // Try root ex: <root>/user.jade
-  view = resolve(root,name+ext);
-  if( exists(view) ) return view;
+    // Try root ex: <root>/user.jade
+    view = resolve(root,name+ext);
+    if( exists(view) ) return true;
+  });
 
-  return null;
+  return exists(view) ? view : null;
 };
 module.exports.lookup = lookup;
 
@@ -286,11 +288,11 @@ function partial(view, options){
   if( locals )
     options.__proto__ = locals;
 
-  // merge app locals into 
+  // merge app locals into
   for(var k in this.app.locals)
     options[k] = options[k] || this.app.locals[k];
 
-  // merge locals, which as set using app.use(function(...){ res.locals = X; }) 
+  // merge locals, which as set using app.use(function(...){ res.locals = X; })
   for(var k in this.req.res.locals)
     options[k] = options[k] || this.req.res.locals[k];
 
@@ -304,7 +306,7 @@ function partial(view, options){
   var root = this.app.get('views') || process.cwd() + '/views'
     , ext = extname(view) || '.' + (this.app.get('view engine')||'ejs')
     , file = lookup(root, view, ext);
-  
+
   // read view
   var source = fs.readFileSync(file,'utf8');
 
