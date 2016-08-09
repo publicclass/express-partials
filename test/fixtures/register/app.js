@@ -4,11 +4,9 @@ var express = require('express')
   , jade = require('jade')
   , app = module.exports = express();
 
-app.configure(function() {
-  app.set('views', __dirname);
-  app.set('view engine', 'ejs');
-  app.use(partials());
-})
+app.set('views', __dirname);
+app.set('view engine', 'ejs');
+app.use(partials());
 
 /* Use `register` to substitute the file extension. */
 app.engine('.j',jade.__express);
