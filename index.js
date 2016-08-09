@@ -194,33 +194,35 @@ function lookup(root, view, ext){
   var name = resolveObjectName(view);
   var original = view;
 
-  // Try root ex: <root>/user.jade
-  view = resolve(root, basename(original,ext)+ext);
-  if( exists(view) ) return view;
+  (typeof root == 'string' ? [root] : root).some(function(root) {
+    // Try root ex: <root>/user.jade
+    view = resolve(root, basename(original,ext)+ext);
+    if( exists(view) ) return true;
 
-  // Try subdir ex: <root>/subdir/user.jade
-  view = resolve(root, dirname(original), basename(original,ext)+ext);
-  if( exists(view) ) return view;
+    // Try subdir ex: <root>/subdir/user.jade
+    view = resolve(root, dirname(original), basename(original,ext)+ext);
+    if( exists(view) ) return true;
 
-  // Try _ prefix ex: ./views/_<name>.jade
-  // taking precedence over the direct path
-  view = resolve(root,'_'+name+ext)
-  if( exists(view) ) return view;
+    // Try _ prefix ex: ./views/_<name>.jade
+    // taking precedence over the direct path
+    view = resolve(root,'_'+name+ext)
+    if( exists(view) ) return true;
 
-  // Try index ex: ./views/user/index.jade
-  view = resolve(root,name,'index'+ext);
-  if( exists(view) ) return view;
+    // Try index ex: ./views/user/index.jade
+    view = resolve(root,name,'index'+ext);
+    if( exists(view) ) return true;
 
-  // Try ../<name>/index ex: ../user/index.jade
-  // when calling partial('user') within the same dir
-  view = resolve(root,'..',name,'index'+ext);
-  if( exists(view) ) return view;
+    // Try ../<name>/index ex: ../user/index.jade
+    // when calling partial('user') within the same dir
+    view = resolve(root,'..',name,'index'+ext);
+    if( exists(view) ) return true;
 
-  // Try root ex: <root>/user.jade
-  view = resolve(root,name+ext);
-  if( exists(view) ) return view;
+    // Try root ex: <root>/user.jade
+    view = resolve(root,name+ext);
+    if( exists(view) ) return true;
+  });
 
-  return null;
+  return exists(view) ? view : null;
 };
 module.exports.lookup = lookup;
 
