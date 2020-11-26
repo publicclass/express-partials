@@ -52,6 +52,12 @@ partials.register('.j',require('jade'));
 partials.register('.j','jade'); 
 ```
 
+You may set the path for the default layout to be used:
+
+```javascript
+app.set('view options', { defaultLayout: '/path/to/layout') });
+```
+
 For an example on how to use partials in the first place I'd recommend you checking out the [Express 2.x ejs example](https://github.com/visionmedia/express/tree/2.x/examples/ejs).
 
 ## Template Support
